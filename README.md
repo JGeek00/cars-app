@@ -1,4 +1,4 @@
-#About Cars App
+# About Cars App
 
 This app has been created using React.
 
@@ -6,7 +6,7 @@ It is an application which provices information about some cars. That data is st
 
 
 
-##Development
+## Development
 
 ###Starting the development server
 
@@ -14,13 +14,13 @@ It is an application which provices information about some cars. That data is st
 npm start
 ```
 
-###Starting the api server
+### Starting the api server
 
 ```bash
 node src/backend/start.js
 ```
 
-###Getting the production build
+### Getting the production build
 
 ```bash
 npm run build
