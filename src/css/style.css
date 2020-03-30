@@ -1,0 +1,68 @@
+.homeContent {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  height: 90vh;
+}
+
+.carsListContent {
+  padding: 20px;
+  display: grid;
+  grid-template-columns: 20% 80%;
+}
+.carsListContent .filter {
+  grid-column: 1/2;
+  margin-right: 50px;
+}
+.carsListContent .table {
+  grid-column: 2/3;
+}
+.carsListContent .table .buttons {
+  box-sizing: border-box;
+  float: left;
+  margin-bottom: 10px;
+  width: 50%;
+}
+.carsListContent .table .buttons button {
+  margin-left: 10px;
+}
+.carsListContent .table .searchBox {
+  box-sizing: border-box;
+  float: left;
+  width: 50%;
+}
+
+.addFormContent {
+  padding: 20px;
+}
+
+.loginContent {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 90vh;
+}
+.loginContent .formFields {
+  width: 40%;
+}
+.loginContent .loginTitle {
+  text-align: center;
+}
+
+.navbar-nav {
+  width: 100%;
+  display: grid !important;
+  grid-template-columns: 90% 10%;
+}
+.navbar-nav .mainMenu {
+  grid-column: 1/2;
+  display: flex;
+}
+.navbar-nav .loginMenu {
+  grid-column: 2/3;
+  display: flex;
+  justify-content: flex-end;
+}
+
+/*# sourceMappingURL=style.css.map */

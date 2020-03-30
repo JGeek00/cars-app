@@ -1,0 +1,77 @@
+.homeContent {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  height: 90vh;
+}
+
+
+.carsListContent {
+  padding: 20px;
+  display: grid;
+  grid-template-columns: 20% 80%;
+
+  .filter {
+    grid-column: 1/2;
+    margin-right: 50px;
+  }
+
+  .table {
+    grid-column: 2/3;
+
+    .buttons {
+      box-sizing: border-box;
+      float: left;
+      margin-bottom: 10px;
+      width: 50%;
+
+      button {
+        margin-left: 10px;
+      }
+    }
+
+    .searchBox {
+      box-sizing: border-box;
+      float: left;
+      width: 50%;
+    }
+  }
+}
+
+
+.addFormContent {
+  padding: 20px;
+}
+
+.loginContent {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 90vh;
+
+  .formFields {
+    width: 40%;
+  }
+
+  .loginTitle {
+    text-align: center;
+  }
+}
+
+.navbar-nav {
+  width: 100%;
+  display: grid !important;
+  grid-template-columns: 90% 10%;
+
+  .mainMenu {
+    grid-column: 1/2;
+    display: flex;
+  }
+
+  .loginMenu {
+    grid-column: 2/3;
+    display: flex;
+    justify-content: flex-end;
+  }
+}
