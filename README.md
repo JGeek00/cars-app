@@ -1,12 +1,27 @@
-##About Cars App
+#About Cars App
+
 This app has been created using React.
 
-It is an application what provices information about some cars. That data is storaged in a MongoDB database.
+It is an application which provices information about some cars. That data is storaged in a MongoDB database. The api is included on this repository.
 
 
 
-###npm start
-It starts the development server.
+##Development
 
-###npm run build
-It creates the production build.
+###Starting the development server
+
+```bash
+npm start
+```
+
+###Starting the api server
+
+```bash
+node src/backend/start.js
+```
+
+###Getting the production build
+
+```bash
+npm run build
+```
