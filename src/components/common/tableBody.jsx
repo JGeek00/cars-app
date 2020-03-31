@@ -5,6 +5,8 @@ import Delete from './delete'
 class TableBody extends Component {
     render() {
         const {data, handleDelete} = this.props;
+
+        
         return (
             <tbody>
             {

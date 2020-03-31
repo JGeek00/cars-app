@@ -3,6 +3,8 @@ import Table from "./table";
 import {Link} from "react-router-dom";
 import axios from "axios";
 import FilterList from "./filterList";
+import {paginate} from "../utils/pagination";
+import Pagination from './common/pagination';
 
 class CarsList extends Component {
     state = {
@@ -11,7 +13,9 @@ class CarsList extends Component {
         tableHead: [],
         brands: [],
         selectedBrand: "",
-        searchQuery: ""
+        searchQuery: "",
+        currentPage: 1,
+        pageSize: 8
     }
 
     async componentDidMount() {
@@ -80,7 +84,11 @@ class CarsList extends Component {
                     }
                 }
             }
-            this.setState({cars: filteredCars});
+            this.setState({
+                cars: filteredCars,
+                currentPage: 1,
+                searchQuery: ""
+            });
         }
     }
 
@@ -98,11 +106,36 @@ class CarsList extends Component {
         var {value} = e.target;
         value = value.toLowerCase();
         const filteredCars = this.state.allCars.filter(car => car.model.toLowerCase().indexOf(value.toLowerCase()) !== -1);
-        this.setState({cars: filteredCars});
+        this.setState({
+            cars: filteredCars,
+            currentPage: 1
+        });
+    }
+
+    getPagedData = () => {
+        const { pageSize, currentPage, cars } = this.state;
+    
+        const paginatedCars = paginate(cars, currentPage, pageSize);
+    
+        return {cars: paginatedCars, totalCount: cars.length};
+    };
+
+    handlePageChange = (page) => {
+        this.setState({ currentPage: page });
+    };
+
+    handleNumItems = (e) => {
+        if (e.target.value === 'all') {
+            this.setState({pageSize: this.state.cars.length});
+        }
+        else {
+            this.setState({pageSize: e.target.value});
+        }
     }
 
     render() {
-        const {cars, tableHead, brands, selectedBrand} = this.state;
+        const {tableHead, brands, selectedBrand, currentPage, pageSize} = this.state;
+        const { totalCount, cars } = this.getPagedData();
         return(
             <div className="carsListContent">
                 <div className="filter">
@@ -117,6 +150,7 @@ class CarsList extends Component {
                         <input type="text" className="form-control" id="searchBox" placeholder="Search" onChange={this.handleSearch}/>
                     </div>
                     <Table data={cars} tableHead={tableHead} handleDelete={this.handleDelete}/>
+                    <Pagination itemsCount={totalCount} pageSize={pageSize} currentPage={currentPage} onPageChange={this.handlePageChange} handleNumItems={this.handleNumItems}/>
                 </div>
             </div>
         )

@@ -65,4 +65,12 @@
   justify-content: flex-end;
 }
 
+.navPagination {
+  display: flex;
+}
+.navPagination .custom-select {
+  width: auto;
+  margin-left: 40px;
+}
+
 /*# sourceMappingURL=style.css.map */
