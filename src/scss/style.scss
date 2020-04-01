@@ -52,9 +52,28 @@
 
 	.formFields {
 		width: 40%;
+
+		.register-button {
+			float: right;
+		}
 	}
 
-	.loginTitle {
+	.title {
+		text-align: center;
+	}
+}
+
+.registerContent {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	height: 90vh;
+
+	.formFields {
+		width: 40%;
+	}
+
+	.title {
 		text-align: center;
 	}
 }
@@ -83,4 +102,36 @@
 		width: auto;
 		margin-left: 40px;
 	}
+}
+
+.usersListContent {
+	padding: 20px;
+	display: grid;
+	grid-template-columns: 20% 80%;
+
+	.filter {
+		grid-column: 1/2;
+		margin-right: 50px;
+	}
+
+	.table {
+		grid-column: 2/3;
+
+		.buttons {
+			box-sizing: border-box;
+			float: left;
+			margin-bottom: 10px;
+			width: 50%;
+
+			button {
+				margin-left: 10px;
+			}
+		}
+
+		.searchBox {
+			box-sizing: border-box;
+			float: left;
+			width: 50%;
+		}
+  	}
 }

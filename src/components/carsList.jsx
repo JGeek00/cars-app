@@ -1,10 +1,11 @@
 import React, {Component} from "react";
-import Table from "./table";
+import CarsTable from "./carsTable";
 import {Link} from "react-router-dom";
 import axios from "axios";
 import FilterList from "./filterList";
 import {paginate} from "../utils/pagination";
 import Pagination from './common/pagination';
+import config from "../config.json";
 
 class CarsList extends Component {
     state = {
@@ -19,7 +20,7 @@ class CarsList extends Component {
     }
 
     async componentDidMount() {
-        const cars = await axios.get('http://localhost:4000/api/cars');
+        const cars = await axios.get(config.apiUrl + "/cars");
 
         const tableHead = [
             {
@@ -36,7 +37,7 @@ class CarsList extends Component {
             }
         ]
 
-        const brands = await axios.get('http://localhost:4000/api/brands');
+        const brands = await axios.get(config.apiUrl + "/brands");
 
         this.setState({
             allCars: cars.data,
@@ -47,7 +48,7 @@ class CarsList extends Component {
     }
 
     handleUpdate = async () => {
-        const cars = await axios.get('http://localhost:4000/api/cars');
+        const cars = await axios.get(config.apiUrl + "cars");
         this.setState({
             cars: cars.data,
             allCars: cars.data
@@ -99,7 +100,7 @@ class CarsList extends Component {
             cars: newData,
             allCars: newData
         });
-        await axios.delete('http://localhost:4000/api/cars/'+id);
+        await axios.delete(config.apiUrl + "/cars/"+id);
     }
 
     handleSearch = (e) => {
@@ -149,7 +150,7 @@ class CarsList extends Component {
                     <div className="searchBox">
                         <input type="text" className="form-control" id="searchBox" placeholder="Search" onChange={this.handleSearch}/>
                     </div>
-                    <Table data={cars} tableHead={tableHead} handleDelete={this.handleDelete}/>
+                    <CarsTable data={cars} tableHead={tableHead} api="carslist" handleDelete={this.handleDelete}/>
                     <Pagination itemsCount={totalCount} pageSize={pageSize} currentPage={currentPage} onPageChange={this.handlePageChange} handleNumItems={this.handleNumItems}/>
                 </div>
             </div>

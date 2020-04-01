@@ -13,6 +13,7 @@ server.use(express.json());
 //Routes
 server.use('/api/cars', require('./routes/cars'));
 server.use('/api/brands', require('./routes/brands'));
+server.use('/api/users', require('./routes/users'));
 
 
 module.exports = server;

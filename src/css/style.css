@@ -46,7 +46,23 @@
 .loginContent .formFields {
   width: 40%;
 }
-.loginContent .loginTitle {
+.loginContent .formFields .register-button {
+  float: right;
+}
+.loginContent .title {
+  text-align: center;
+}
+
+.registerContent {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 90vh;
+}
+.registerContent .formFields {
+  width: 40%;
+}
+.registerContent .title {
   text-align: center;
 }
 
@@ -71,6 +87,33 @@
 .navPagination .custom-select {
   width: auto;
   margin-left: 40px;
+}
+
+.usersListContent {
+  padding: 20px;
+  display: grid;
+  grid-template-columns: 20% 80%;
+}
+.usersListContent .filter {
+  grid-column: 1/2;
+  margin-right: 50px;
+}
+.usersListContent .table {
+  grid-column: 2/3;
+}
+.usersListContent .table .buttons {
+  box-sizing: border-box;
+  float: left;
+  margin-bottom: 10px;
+  width: 50%;
+}
+.usersListContent .table .buttons button {
+  margin-left: 10px;
+}
+.usersListContent .table .searchBox {
+  box-sizing: border-box;
+  float: left;
+  width: 50%;
 }
 
 /*# sourceMappingURL=style.css.map */
