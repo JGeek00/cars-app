@@ -8,7 +8,7 @@ It is an application which provices information about some cars. That data is st
 
 ## Development
 
-###Starting the development server
+### Starting the development server
 
 ```bash
 npm start
@@ -17,7 +17,17 @@ npm start
 ### Starting the api server
 
 ```bash
-node src/backend/start.js
+cd src/backend
+node start.js
+```
+
+### Working with stylesheets
+
+For this project I'm using the SASS CSS preprocessor. The SASS stylesheet is storaged in src/scss and the final CSS stylesheets are storaged in src/css.
+For convert SCSS into CSS run the next command into /src folder.
+
+```bash
+sass --watch ./scss:./css
 ```
 
 ### Getting the production build

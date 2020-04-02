@@ -50,12 +50,12 @@ usersCtrl.updateUser = async (req, res) => {
     });
     if (user) {
         res.json({
-            message: "success"
+            result: "success"
         });
     }
     else {
         res.status(400).json({
-            message: "fail"
+            result: "fail"
         });
     }
 }
