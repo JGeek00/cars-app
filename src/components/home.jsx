@@ -6,7 +6,7 @@ class Home extends Component {
         return (
             <div className="homeContent">
                <div> <h3>Welcome to Cars App</h3></div>
-               <img src={carImg} />
+               <img src={carImg} alt="Logo"/>
             </div>
         )
     }

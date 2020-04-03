@@ -26,7 +26,7 @@ class UsersTable extends Component {
                                 <td>{element.email}</td>
                                 <td>{element.username}</td>
                                 {/* <td>{element.brand.map(brand => brand.name)}</td> */}
-                                <td><Delete id={element._id} data={data} handleDelete={handleDelete}/></td>
+                                <td><Delete id={element._id} data={data} handleDelete={handleDelete} status={element.username}/></td>
                             </tr>
                         ))
                     }

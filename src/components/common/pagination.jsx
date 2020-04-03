@@ -2,22 +2,34 @@ import React from "react";
 import PropTypes from "prop-types";
 import _ from "lodash";
 
-const Pagination = ({ itemsCount, pageSize, currentPage, onPageChange, handleNumItems }) => {
+const Pagination = ({ itemsCount, pageSize, currentPage, onPageChange, handleNumItems, selectedPageSize }) => {
     const pagesCount = Math.ceil(itemsCount / pageSize);
-    const pages = _.range(1, pagesCount + 1);
+	const pages = _.range(1, pagesCount + 1);
+	
+	var style = {};
+	if (itemsCount === 0) {
+		style = {
+			display: 'none'
+		}
+	}
+	else {
+		style = {
+			display: 'flex'
+		}
+	}
 
     return (
         <nav className="navPagination">
             <ul className="pagination">
 				{pages.map(page => (
 					<li key={page} className={page === currentPage ? "page-item active" : "page-item"}>
-						<a className="page-link" onClick={() => onPageChange(page)}>
+						<button className="page-link" onClick={() => onPageChange(page)}>
 							{page}
-						</a>
+						</button>
 					</li>
 				))}
           	</ul>
-        	<select className="custom-select" defaultValue="8" onChange={handleNumItems}>
+        	<select className="custom-select" defaultValue="8" onChange={handleNumItems} style={style} value={selectedPageSize}>
 				<option value="4">4</option>
 				<option value="8">8</option>
 				<option value="16">16</option>

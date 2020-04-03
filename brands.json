@@ -1,0 +1,10 @@
+{"_id":{"$oid":"5e7a71e7e0d9bf93cd85a5cf"},"name":"BMW"}
+{"_id":{"$oid":"5e7a7434a2eeef941282957a"},"name":"Seat"}
+{"_id":{"$oid":"5e7a746ca2eeef941282957b"},"name":"Audi"}
+{"_id":{"$oid":"5e7a747ca2eeef941282957c"},"name":"Skoda"}
+{"_id":{"$oid":"5e7a748aa2eeef941282957d"},"name":"Peugeot"}
+{"_id":{"$oid":"5e7a7493a2eeef941282957e"},"name":"Volkswagen"}
+{"_id":{"$oid":"5e7a749ea2eeef941282957f"},"name":"Mercedes"}
+{"_id":{"$oid":"5e7b4ef8d29641a2511827d9"},"name":"Porsche"}
+{"_id":{"$oid":"5e86fe87f3dc116ed11f8aec"},"name":"Opel","__v":0}
+{"_id":{"$oid":"5e86ff38f52aba6ef2446ca4"},"name":"Jaguar","__v":0}

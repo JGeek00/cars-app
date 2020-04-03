@@ -71,6 +71,17 @@ class UserList extends Component {
         this.setState({tableHead: tableHead});
     }
 
+    handleDelete = async (id) => {
+        const data = this.state.users;
+        const newData = data.filter(user => user._id !== id);
+        this.setState({
+            users: newData,
+            allUsers: newData
+        });
+        await axios.delete(config.apiUrl + "/users/"+id);
+    }
+
+
     render() { 
         const {users, tableHead} = this.state;
         return (
@@ -80,7 +91,7 @@ class UserList extends Component {
                         <Link to="users/new" className="btn btn-primary" api="users">Create user</Link>
                         <button className="btn btn-primary" onClick={this.handleUpdate}>Refresh</button>
                     </div>
-                    <UsersTable data={users} tableHead={tableHead} api="users"/>
+                    <UsersTable data={users} tableHead={tableHead} api="users" handleDelete={this.handleDelete}/>
                 </div>
             </div>
         );

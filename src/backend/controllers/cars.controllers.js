@@ -20,8 +20,13 @@ carsCtrl.createCar = async (req, res) => {
         model: model,
         brand: brand
     });
-    await car.save();
-    res.json(car);
+    const created = await car.save();
+    if (created) {
+        res.json({result: "success"});
+    }
+    else {
+        res.status(400).json({result: "fail"});
+    }
 }
 
 carsCtrl.getCar = async (req, res) => {
@@ -37,7 +42,12 @@ carsCtrl.updateCar = async (req, res) => {
         model: model,
         brand: brand
     });
-    res.json(updated);
+    if (updated) {
+        res.json({result: "success"});
+    }
+    else {
+        res.status(400).json({result: "fail"});
+    }
 }
 
 carsCtrl.deleteCar = async (req, res) => {

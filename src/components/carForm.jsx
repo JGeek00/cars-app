@@ -36,12 +36,23 @@ class CarForm extends Component {
             "brand": brand
         }
         if (id === "new") {
-            await axios.post('http://localhost:4000/api/cars', updatedCar);
-            this.props.history.push('/carslist');
+            const result = await axios.post('http://localhost:4000/api/cars', updatedCar);
+            if (result.data.result === "success") {
+                this.props.history.push('/carslist');
+            }
+            else if (result.data.result === "fail") {
+                toast.error("An error occurred while creating the car");
+            }
+            
         }
         else {
-            await axios.put('http://localhost:4000/api/cars/' + id, updatedCar);
-            this.props.history.push('/carslist');
+            const result = await axios.put('http://localhost:4000/api/cars/' + id, updatedCar);
+            if (result.data.result === "success") {
+                this.props.history.push('/carslist');
+            }
+            else if (result.data.result === "fail") {
+                toast.error("An error occurred while creating the car");
+            }
         }
     }
     

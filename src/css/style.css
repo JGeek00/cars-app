@@ -15,22 +15,35 @@
   grid-column: 1/2;
   margin-right: 50px;
 }
-.carsListContent .table {
+.carsListContent .listContent {
   grid-column: 2/3;
+  display: flex;
+  flex-direction: column;
 }
-.carsListContent .table .buttons {
+.carsListContent .listContent .topElements {
+  width: 100%;
+  height: 40px;
+  margin-bottom: 10px;
+}
+.carsListContent .listContent .topElements .buttons {
   box-sizing: border-box;
   float: left;
   margin-bottom: 10px;
   width: 50%;
 }
-.carsListContent .table .buttons button {
+.carsListContent .listContent .topElements .buttons button {
   margin-left: 10px;
 }
-.carsListContent .table .searchBox {
+.carsListContent .listContent .topElements .searchBox {
   box-sizing: border-box;
   float: left;
   width: 50%;
+}
+.carsListContent .listContent .titleNoCars {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 80vh;
 }
 
 .addFormContent {
@@ -84,9 +97,24 @@
 .navPagination {
   display: flex;
 }
+.navPagination .page-item {
+  cursor: pointer;
+}
 .navPagination .custom-select {
+  cursor: pointer;
   width: auto;
   margin-left: 40px;
+}
+.navPagination button {
+  box-shadow: none;
+}
+
+.filter-list li {
+  cursor: pointer;
+}
+.filter-list .li-inactive:hover {
+  background-color: #dee2e6;
+  border-color: #dee2e6;
 }
 
 .usersListContent {
@@ -114,6 +142,13 @@
   box-sizing: border-box;
   float: left;
   width: 50%;
+}
+
+.contentBrandsList {
+  padding: 20px;
+}
+.contentBrandsList .contentTop {
+  margin-bottom: 20px;
 }
 
 /*# sourceMappingURL=style.css.map */

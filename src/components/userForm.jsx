@@ -39,7 +39,7 @@ class UserForm extends Component {
 
     handleUpdate = async () => {
         const {id, name, surname, email, username} = this.state;
-        if (id != "" && name != "" && surname != "" && email != "" && username != "") {
+        if (id !== "" && name !== "" && surname !== "" && email !== "" && username !== "") {
             if (id === "new") {
                 const updatedUser = {
                     "name": name,
@@ -51,8 +51,8 @@ class UserForm extends Component {
                 try {
                     const result = await axios.post(config.apiUrl + "/users", updatedUser);
                     console.log(result);
-                    if (result.data.result == "fail") {
-                        if (result.data.message == "username-not-available") {
+                    if (result.data.result === "fail") {
+                        if (result.data.message === "username-not-available") {
                             toast.error("This username is not available");
                         }
                         else {
@@ -60,7 +60,7 @@ class UserForm extends Component {
                         }
                         
                     }
-                    else if (result.data.result == "success") {
+                    else if (result.data.result === "success") {
                         this.props.history.push('/users');
                     }
                 } catch (err) {
@@ -77,10 +77,10 @@ class UserForm extends Component {
                 try {
                     const result = await axios.put(config.apiUrl + "/users/" + id, updatedUser);
                     console.log("update",result);
-                    if (result.data.result == "fail") {
+                    if (result.data.result === "fail") {
                         toast.error("An error has occurred when updating the user");
                     }
-                    else if (result.data.result == "success") {
+                    else if (result.data.result === "success") {
                         this.props.history.push('/users');
                     }
                 } catch (error) {
@@ -94,7 +94,7 @@ class UserForm extends Component {
         const state = this.state;
         const { name, value } = e.target;
         this.setState({ [name]: value });
-        if (state.id != "" && state.name != "" && state.surname != "" && state.email != "" && state.username != "") {
+        if (state.id !== "" && state.name !== "" && state.surname !== "" && state.email !== "" && state.username !== "") {
             this.setState({submit: false});
         }
         else {

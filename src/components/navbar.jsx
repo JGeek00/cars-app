@@ -1,4 +1,4 @@
-import React, {Component} from "react";
+import React from "react";
 import {NavLink} from "react-router-dom";
 
 const Navbar = () => {
@@ -20,6 +20,11 @@ const Navbar = () => {
                         <li className="nav-item">
                             <NavLink className="nav-item nav-link" to="/carslist">
                                 Cars list
+                            </NavLink>
+                        </li>
+                        <li className="nav-item">
+                            <NavLink className="nav-item nav-link" to="/brands">
+                                Brands list
                             </NavLink>
                         </li>
                         <li className="nav-item">

@@ -16,7 +16,8 @@ class CarsList extends Component {
         selectedBrand: "",
         searchQuery: "",
         currentPage: 1,
-        pageSize: 8
+        pageSize: 8,
+        selectedPageSize: 8
     }
 
     async componentDidMount() {
@@ -77,7 +78,7 @@ class CarsList extends Component {
             this.setState({cars: this.state.allCars});
             this.setState({selectedBrand: brand});
             const cars = this.state.allCars;
-            let filteredCars = new Array();
+            let filteredCars = [];
             for (let car of cars) {
                 for (let eachBrand of car.brand) {
                     if (eachBrand._id === brand) {
@@ -85,10 +86,12 @@ class CarsList extends Component {
                     }
                 }
             }
+            
             this.setState({
                 cars: filteredCars,
                 currentPage: 1,
-                searchQuery: ""
+                searchQuery: "",
+                pageSize: 8
             });
         }
     }
@@ -109,7 +112,8 @@ class CarsList extends Component {
         const filteredCars = this.state.allCars.filter(car => car.model.toLowerCase().indexOf(value.toLowerCase()) !== -1);
         this.setState({
             cars: filteredCars,
-            currentPage: 1
+            currentPage: 1,
+            searchQuery: value
         });
     }
 
@@ -134,24 +138,37 @@ class CarsList extends Component {
         }
     }
 
+
     render() {
-        const {tableHead, brands, selectedBrand, currentPage, pageSize} = this.state;
+        const {tableHead, brands, selectedBrand, currentPage, selectedPageSize, searchQuery, pageSize} = this.state;
         const { totalCount, cars } = this.getPagedData();
         return(
             <div className="carsListContent">
                 <div className="filter">
                     <FilterList data={brands} handleFilter={this.handleFilter} selectedBrand={selectedBrand}/>
                 </div>
-                <div className="table">
-                    <div className="buttons">
-                        <Link to="carslist/new" className="btn btn-primary">Add</Link>
-                        <button className="btn btn-primary" onClick={this.handleUpdate}>Refresh</button>
+                <div className="listContent">
+                    <div className="topElements">
+                        <div className="buttons">
+                            <Link to="carslist/new" className="btn btn-primary">Create car</Link>
+                            <button className="btn btn-primary" onClick={this.handleUpdate}>Refresh</button>
+                        </div>
+                        <div className="searchBox">
+                            <input type="text" className="form-control" id="searchBox" placeholder="Search" value={searchQuery} onChange={this.handleSearch}/>
+                        </div>
                     </div>
-                    <div className="searchBox">
-                        <input type="text" className="form-control" id="searchBox" placeholder="Search" onChange={this.handleSearch}/>
-                    </div>
-                    <CarsTable data={cars} tableHead={tableHead} api="carslist" handleDelete={this.handleDelete}/>
-                    <Pagination itemsCount={totalCount} pageSize={pageSize} currentPage={currentPage} onPageChange={this.handlePageChange} handleNumItems={this.handleNumItems}/>
+                    {
+                        cars.length !== 0 ? (
+                            <div className="table">
+                                <CarsTable data={cars} tableHead={tableHead} api="carslist" handleDelete={this.handleDelete}/>
+                                <Pagination itemsCount={totalCount} pageSize={pageSize} currentPage={currentPage} onPageChange={this.handlePageChange} handleNumItems={this.handleNumItems} numItems={selectedPageSize}/>
+                            </div>
+                        ) : (
+                            <div className="titleNoCars">
+                                <h3>There are no cars available</h3>
+                            </div>
+                        )
+                    }
                 </div>
             </div>
         )

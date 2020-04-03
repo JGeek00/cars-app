@@ -12,7 +12,13 @@ brandsCtrl.createBrand = async (req, res) => {
     const brand = new Brand({
         name: name
     });
-    await brand.save();
+    const send = await brand.save();
+    if (send) {
+        res.json({result: "success"});
+    }
+    else {
+        res.code(400).json({result: "fail"});
+    }
 }
 
 brandsCtrl.getBrand = async (req, res) => {
@@ -24,9 +30,15 @@ brandsCtrl.getBrand = async (req, res) => {
 brandsCtrl.updateBrand = async (req, res) => {
     const id = req.params.id;
     const {name} = req.body;
-    await Brand.findOneAndUpdate({_id: id}, {
+    const result = await Brand.findOneAndUpdate({_id: id}, {
         name: name
     });
+    if (result) {
+        res.json({result: "success"});
+    }
+    else {
+        res.status(400).json({result: "fail"});
+    }
 }
 
 brandsCtrl.deleteBrand = async (req, res) => {

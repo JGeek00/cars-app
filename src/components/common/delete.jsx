@@ -1,12 +1,11 @@
 import React, {Component} from "react";
-import axios from 'axios'
 
 class Delete extends Component {
 
     render() {
-        const {id, handleDelete} = this.props;
+        const {id, handleDelete, status} = this.props;
         return(
-            <button type="button" id={id} className="btn btn-danger" onClick={() => handleDelete(id)}>Delete</button>
+            <button type="button" id={id} className="btn btn-danger" onClick={() => handleDelete(id)} disabled={status === 'admin' ? true : false}>Delete</button>
         )
     }
 }

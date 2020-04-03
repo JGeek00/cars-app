@@ -9,9 +9,10 @@ import Login from './components/login';
 import Register from './components/register';
 import UserList from './components/userList';
 import UserForm from './components/userForm';
+import BrandsList from './components/brandsList';
+import BrandsForm from './components/brandsForm';
 
 import { Route, Redirect, Switch } from "react-router-dom";
-import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 import './css/App.css';
@@ -28,6 +29,8 @@ function App() {
 			<Navbar/>
 			<div>
 				<Switch>
+					<Route path="/brands/:id" component={BrandsForm}/>
+					<Route path="/brands" component={BrandsList}/>
 					<Route path="/users/:id" component={UserForm}/>
 					<Route path="/users/new" component={UserForm}/>
 					<Route path="/users" component={UserList}/>
