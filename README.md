@@ -21,6 +21,14 @@ cd src/backend
 node start.js
 ```
 
+### Data examples
+
+Data collections are storaged into /data. 
+
+#### Importing with MongoDB Compass
+
+Go to the database and create the collection. Then inside that, go to Collection > Import data. There, select the JSON file of that collection, and import it.
+
 ### Working with stylesheets
 
 For this project I'm using the SASS CSS preprocessor. The SASS stylesheet is storaged into src/scss and the final CSS stylesheets are storaged into src/css.

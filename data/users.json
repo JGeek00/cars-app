@@ -1,0 +1,2 @@
+{"_id":{"$oid":"5e85f9231270df6182815326"},"username":"admin","password":"password","name":"admin","surname":"admin","email":"admin@admin.com","__v":{"$numberInt":"0"}}
+{"_id":{"$oid":"5e85f9a01270df6182815327"},"username":"user","password":"password","name":"user","surname":"user","email":"user@user.com","__v":{"$numberInt":"0"}}
