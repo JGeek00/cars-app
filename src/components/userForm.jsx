@@ -11,6 +11,7 @@ class UserForm extends Component {
         surname:"",
         email: "",
         username: "", 
+        password: "",
         pageTitle: "",
         submit: true
     }
@@ -38,7 +39,7 @@ class UserForm extends Component {
     }
 
     handleUpdate = async () => {
-        const {id, name, surname, email, username} = this.state;
+        const {id, name, surname, email, username, password} = this.state;
         if (id !== "" && name !== "" && surname !== "" && email !== "" && username !== "") {
             if (id === "new") {
                 const updatedUser = {
@@ -46,11 +47,10 @@ class UserForm extends Component {
                     "surname": surname,
                     "email": email,
                     "username": username, 
-                    "password": "password"
+                    "password": password
                 }
                 try {
                     const result = await axios.post(config.apiUrl + "/users", updatedUser);
-                    console.log(result);
                     if (result.data.result === "fail") {
                         if (result.data.message === "username-not-available") {
                             toast.error("This username is not available");
@@ -103,7 +103,7 @@ class UserForm extends Component {
     }
 
     render() {
-        const {name, surname, email, username, pageTitle, submit} = this.state;
+        const {id, name, surname, email, username, password, pageTitle, submit} = this.state;
         return (
             <div className="addFormContent">
                 <ToastContainer position="top-right"/>
@@ -125,6 +125,16 @@ class UserForm extends Component {
                         <label htmlFor="username">Username</label>
                         <input type="text" className="form-control" name="username" id="username" value={username} onChange={this.handleChange}/>
                     </div>
+                    {
+                        id === "new" ? (
+                            <div className="form-group">
+                                <label htmlFor="password">Password</label>
+                                <input type="password" className="form-control" name="password" id="password" value={password} onChange={this.handleChange}/>
+                            </div>
+                        ) : (
+                            <div></div>
+                        )
+                    }
                     <button type="button" className="btn btn-primary" onClick={this.handleUpdate} disabled={submit}>Save</button>
                 </form>
             </div>

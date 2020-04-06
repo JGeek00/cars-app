@@ -1,5 +1,7 @@
 import React, { Component } from 'react';
 import {Link} from 'react-router-dom';
+import axios from 'axios';
+import config from '../config.json';
 
 class Login extends Component {
     state = {
@@ -12,8 +14,12 @@ class Login extends Component {
         this.setState({[name]: value});
     }
 
-    handleLogin = () => {
-
+    handleLogin = async () => {
+        const {username, password} = this.state;
+        await axios.post(config.apiUrl + '/login', {
+            username: username,
+            password: password
+        });
     }
 
     render() { 

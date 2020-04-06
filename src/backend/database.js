@@ -2,10 +2,11 @@ const mongoose = require('mongoose');
 
 const uri = process.env.MONGODB_URI
     ? process.env.MONGODB_URI
-    : 'mongodb://localhost/databasetest';
+    : 'mongodb://localhost/cars-app';
 
 mongoose.connect(uri, {
     useNewUrlParser: true,
+    useUnifiedTopology: true,
     useCreateIndex: true,
     useFindAndModify: false
 });
