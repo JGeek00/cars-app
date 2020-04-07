@@ -1,14 +1,15 @@
 const {getCars, createCar, getCar, updateCar, deleteCar} = require('../controllers/cars.controllers');
 const {Router} = require('express');
 const router = Router();
+const verifyToken = require('../controllers/verifyToken');
 
 router.route('/')
-    .get(getCars)
-    .post(createCar)
+    .get(verifyToken, getCars)
+    .post(verifyToken, createCar)
 
 router.route('/:id')
-    .get(getCar)
-    .put(updateCar)
-    .delete(deleteCar)
+    .get(verifyToken, getCar)
+    .put(verifyToken, updateCar)
+    .delete(verifyToken, deleteCar)
 
 module.exports = router;

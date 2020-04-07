@@ -3,29 +3,46 @@ const Car = require('../models/Car');
 const carsCtrl = {};
 
 carsCtrl.getCars = async (req, res) => {
-    const cars = await Car.aggregate([{
-        $lookup: {
-            from: "brands",
-            localField: "brand",
-            foreignField: "_id",
-            as: "brand"
+    const tokenVal = req.user_token_id;
+    if (tokenVal) {
+        try {
+            const cars = await Car.aggregate([{
+                $lookup: {
+                    from: "brands",
+                    localField: "brand",
+                    foreignField: "_id",
+                    as: "brand"
+                }
+            }]).sort({model: 1});
+            res.json(cars);
+        } catch (error) {
+            res.status(400).json({
+                result: 'fail',
+                message: error.message
+            });
         }
-    }]).sort({model: 1});
-    res.json(cars);
+    }
 };
 
 carsCtrl.createCar = async (req, res) => {
-    const {model, brand} = req.body;
-    const car = new Car({
-        model: model,
-        brand: brand
-    });
-    const created = await car.save();
-    if (created) {
-        res.json({result: "success"});
-    }
-    else {
-        res.status(400).json({result: "fail"});
+    const tokenVal = req.user_token_id;
+    if (tokenVal) {
+        const {model, brand} = req.body;
+        const car = new Car({
+            model: model,
+            brand: brand
+        });
+        try {
+            const created = await car.save();
+            if (created) {
+                res.json({result: "success"});
+            }
+            else {
+                res.status(400).json({result: "fail"});
+            }
+        } catch (error) {
+            res.status(400).json({result: "fail", message: error});
+        }
     }
 }
 

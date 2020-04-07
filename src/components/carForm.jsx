@@ -11,11 +11,24 @@ class CarForm extends Component {
     }
 
     async componentDidMount() {
+        const token = window.sessionStorage.getItem('token');
+        if (!token) {
+            this.props.history.push('/login');
+        }
+
         const id = this.props.match.params.id;
-        const brands = await axios.get('http://localhost:4000/api/brands');
+        const brands = await axios.get('http://localhost:4000/api/brands', {
+            headers: {
+                'x-access-token': token
+            }
+        });
         this.setState({brands: brands.data});
         if (id !== "new") {
-            const car = await axios.get('http://localhost:4000/api/cars/'+id);
+            const car = await axios.get('http://localhost:4000/api/cars/'+id, {
+                headers: {
+                    'x-access-token': token
+                }
+            });
             this.setState({
                 id: id,
                 model: car.data.model,
@@ -28,6 +41,7 @@ class CarForm extends Component {
     }
 
     handleUpdate = async () => {
+        const token = window.sessionStorage.getItem('token');
         const id = this.state.id;
         const model = this.state.model;
         const brand = this.state.brand;
@@ -36,22 +50,37 @@ class CarForm extends Component {
             "brand": brand
         }
         if (id === "new") {
-            const result = await axios.post('http://localhost:4000/api/cars', updatedCar);
+            const result = await axios.post('http://localhost:4000/api/cars', updatedCar, {
+                headers: {
+                    'x-access-token': token
+                }
+            });
             if (result.data.result === "success") {
                 this.props.history.push('/carslist');
             }
-            else if (result.data.result === "fail") {
+            else if (result.data.result === "fail" && result.data.message === "no-token") { 
+                window.sessionStorage.removeItem('token');
+                this.props.history.push('/login');
+            }
+            else if (result.data.result === "fail" && result.data.message !== "no-token") {
                 toast.error("An error occurred while creating the car");
             }
-            
         }
         else {
-            const result = await axios.put('http://localhost:4000/api/cars/' + id, updatedCar);
+            const result = await axios.put('http://localhost:4000/api/cars/' + id, updatedCar, {
+                headers: {
+                    'x-access-token': token
+                }
+            });
             if (result.data.result === "success") {
                 this.props.history.push('/carslist');
             }
-            else if (result.data.result === "fail") {
-                toast.error("An error occurred while creating the car");
+            else if (result.data.result === "fail" && result.data.message === "no-token") { 
+                window.sessionStorage.removeItem('token');
+                this.props.history.push('/login');
+            }
+            else if (result.data.result === "fail" && result.data.message !== "no-token") {
+                toast.error("An error occurred while updating the car");
             }
         }
     }

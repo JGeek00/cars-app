@@ -10,7 +10,16 @@ class BrandsList extends Component {
     }
 
     async componentDidMount() {
-        const brands = await axios.get(config.apiUrl + '/brands');
+        const token = window.sessionStorage.getItem('token');
+        if (!token) {
+            this.props.history.push('/login');
+        }
+
+        const brands = await axios.get(config.apiUrl + '/brands', {
+            headers: {
+                'x-access-token': token
+            }
+        });
         this.setState({ brands: brands.data });
     }
 

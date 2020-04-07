@@ -9,8 +9,17 @@ class BradsForm extends Component {
     }
 
     async componentDidMount() {
+        const token = window.sessionStorage.getItem('token');
+        if (!token) {
+            this.props.history.push('/login');
+        }
+
         const id = this.props.match.params.id;
-        const {data} = await axios.get(config.apiUrl + '/brands/' + id);
+        const {data} = await axios.get(config.apiUrl + '/brands/' + id, {
+            headers: {
+                'x-access-token': token
+            }
+        });
         this.setState({name: data.name});
     }
 
@@ -20,26 +29,43 @@ class BradsForm extends Component {
     }
 
     handleUpdate = async () => {
+        const token = window.sessionStorage.getItem('token');
         const id = this.props.match.params.id;
         const { name } = this.state;
         if (id === "new") {
             const newBrand = {name: name};
-            const query = await axios.post(config.apiUrl + '/brands', newBrand);
-            if (query.data.result === "success") {
+            const result = await axios.post(config.apiUrl + '/brands', newBrand, {
+                headers: {
+                    'x-access-token': token
+                }
+            });
+            if (result.data.result === "success") {
                 this.props.history.push('/brands');
             }
-            else if (query.data.result === "fail") {
-                toast.error("An error has occurred when adding the brand")
+            else if (result.data.result === "fail" && result.data.message === "no-token") { 
+                window.sessionStorage.removeItem('token');
+                this.props.history.push('/login');
+            }
+            else if (result.data.result === "fail" && result.data.message !== "no-token") {
+                toast.error("An error occurred while creating the brand");
             }
         }
         else {
             const updatedBrand = {name: name};
-            const query = await axios.put(config.apiUrl + '/brands/' + id, updatedBrand);
-            if (query.data.result === "success") {
+            const result = await axios.put(config.apiUrl + '/brands/' + id, updatedBrand, {
+                headers: {
+                    'x-access-token': token
+                }
+            });
+            if (result.data.result === "success") {
                 this.props.history.push('/brands');
             }
-            else if (query.data.result === "fail") {
-                toast.error("An error has occurred when updating the brand")
+            else if (result.data.result === "fail" && result.data.message === "no-token") { 
+                window.sessionStorage.removeItem('token');
+                this.props.history.push('/login');
+            }
+            else if (result.data.result === "fail" && result.data.message !== "no-token") {
+                toast.error("An error occurred while creating the brand");
             }
         }
     }

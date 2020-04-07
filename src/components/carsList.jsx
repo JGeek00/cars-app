@@ -21,7 +21,16 @@ class CarsList extends Component {
     }
 
     async componentDidMount() {
-        const cars = await axios.get(config.apiUrl + "/cars");
+        const token = window.sessionStorage.getItem('token');
+        if (!token) {
+            this.props.history.push('/login');
+        }
+
+        const cars = await axios.get(config.apiUrl + "/cars", {
+            headers: {
+                'x-access-token': token
+            }
+        });
 
         const tableHead = [
             {
@@ -38,7 +47,11 @@ class CarsList extends Component {
             }
         ]
 
-        const brands = await axios.get(config.apiUrl + "/brands");
+        const brands = await axios.get(config.apiUrl + "/brands", {
+            headers: {
+                'x-access-token': token
+            }
+        });
 
         this.setState({
             allCars: cars.data,
@@ -49,7 +62,17 @@ class CarsList extends Component {
     }
 
     handleUpdate = async () => {
-        const cars = await axios.get(config.apiUrl + "cars");
+        const token = window.sessionStorage.getItem('token');
+        const cars = await axios.get(config.apiUrl + "/cars", {
+            headers: {
+                'x-access-token': token
+            }
+        });
+        if (cars.data.result === "fail" && cars.data.message === "no-token") { 
+            window.sessionStorage.removeItem('token');
+            this.props.history.push('/login');
+        }
+
         this.setState({
             cars: cars.data,
             allCars: cars.data
@@ -103,7 +126,17 @@ class CarsList extends Component {
             cars: newData,
             allCars: newData
         });
-        await axios.delete(config.apiUrl + "/cars/"+id);
+
+        const token = window.sessionStorage.getItem('token');
+        const result = await axios.delete(config.apiUrl + "/cars/"+id , {
+            headers: {
+                'x-access-token': token
+            }
+        });
+        if (result.data.result === "fail" && result.data.message === "no-token") { 
+            window.sessionStorage.removeItem('token');
+            this.props.history.push('/login');
+        }
     }
 
     handleSearch = (e) => {
@@ -145,7 +178,7 @@ class CarsList extends Component {
         return(
             <div className="carsListContent">
                 <div className="filter">
-                    <FilterList data={brands} handleFilter={this.handleFilter} selectedBrand={selectedBrand}/>
+                    <FilterList data={brands} handleFilter={this.handleFilter} selectedItem={selectedBrand}/>
                 </div>
                 <div className="listContent">
                     <div className="topElements">
