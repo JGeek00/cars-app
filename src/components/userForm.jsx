@@ -17,9 +17,23 @@ class UserForm extends Component {
     }
 
     async componentDidMount() {
+        const token = window.sessionStorage.getItem('token');
+        if (!token) {
+            this.props.history.push('/login');
+        }
+
         const id = this.props.match.params.id;
         if (id !== "new") {
-            const user = await axios.get(config.apiUrl + "/users/"+id);
+            const token = window.sessionStorage.getItem('token');
+            const user = await axios.get(config.apiUrl + "/users/"+id, {
+                headers: {
+                    'x-access-token': token
+                }
+            });
+            if (user.data.result === "fail" && user.data.message === "no-token") {
+                window.sessionStorage.removeItem('token');
+                this.props.history.push('/login');
+            }
             this.setState({
                 id: id,
                 name: user.data.name,
@@ -50,18 +64,24 @@ class UserForm extends Component {
                     "password": password
                 }
                 try {
-                    const result = await axios.post(config.apiUrl + "/users", updatedUser);
-                    if (result.data.result === "fail") {
-                        if (result.data.message === "username-not-available") {
-                            toast.error("This username is not available");
+                    const token = window.sessionStorage.getItem('token');
+                    const result = await axios.post(config.apiUrl + "/users", updatedUser, {
+                        headers: {
+                            'x-access-token': token
                         }
-                        else {
-                            toast.error("Error when creating the user");
-                        }
-                        
+                    });
+                    if (result.data.result === "fail" && result.data.message === "no-token") {
+                        window.sessionStorage.removeItem('token');
+                        this.props.history.push('/login');
+                    }
+                    else if (result.data.result === "fail" && result.data.message === "username-not-available") {
+                        toast.error("This username is not available");
                     }
                     else if (result.data.result === "success") {
                         this.props.history.push('/users');
+                    }
+                    else {
+                        toast.error("Error when creating the user");
                     }
                 } catch (err) {
                     toast.error("An error has occurred when creating the user");
@@ -75,9 +95,17 @@ class UserForm extends Component {
                     "username": username
                 }
                 try {
-                    const result = await axios.put(config.apiUrl + "/users/" + id, updatedUser);
-                    console.log("update",result);
-                    if (result.data.result === "fail") {
+                    const token = window.sessionStorage.getItem('token');
+                    const result = await axios.put(config.apiUrl + "/users/" + id, updatedUser, {
+                        headers: {
+                            'x-access-token': token
+                        }
+                    });
+                    if (result.data.result === "fail" && result.data.message === "no-token") {
+                        window.sessionStorage.removeItem('token');
+                        this.props.history.push('/login');
+                    }
+                    else if (result.data.result === "fail" && result.data.message !== "no-token") {
                         toast.error("An error has occurred when updating the user");
                     }
                     else if (result.data.result === "success") {

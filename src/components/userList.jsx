@@ -11,7 +11,20 @@ class UserList extends Component {
     }
 
     async componentDidMount () {
-        const users = await axios.get(config.apiUrl + "/users");
+        const token = window.sessionStorage.getItem('token');
+        if (!token) {
+            this.props.history.push('/login');
+        }
+    
+        const users = await axios.get(config.apiUrl + "/users", {
+            headers: {
+                'x-access-token': token
+            }
+        });
+        if (users.data.result === "fail" && users.data.message === "no-token") {
+            window.sessionStorage.removeItem('token');
+            this.props.history.push('/login');
+        }
 
         const tableHead = [
             {
@@ -43,7 +56,16 @@ class UserList extends Component {
     }
 
     handleUpdate = async () => {
-        const users = await axios.get(config.apiUrl + "/users");
+        const token = window.sessionStorage.getItem('token');
+        const users = await axios.get(config.apiUrl + "/users", {
+            headers: {
+                'x-access-token': token
+            }
+        });
+        if (users.data.result === "fail" && users.data.message === "no-token") {
+            window.sessionStorage.removeItem('token');
+            this.props.history.push('/login');
+        }
 
         this.setState({
             users: users.data
@@ -78,7 +100,16 @@ class UserList extends Component {
             users: newData,
             allUsers: newData
         });
-        await axios.delete(config.apiUrl + "/users/"+id);
+        const token = window.sessionStorage.getItem('token');
+        const result = await axios.delete(config.apiUrl + "/users/"+id, {
+            headers: {
+                'x-access-token': token
+            }
+        });
+        if (result.data.result === "fail" && result.data.message === "no-token") {
+            window.sessionStorage.removeItem('token');
+            this.props.history.push('/login');
+        }
     }
 
 

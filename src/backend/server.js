@@ -1,5 +1,6 @@
 const express = require('express');
 const server = express();
+const session = require('express-session');
 
 const cors = require('cors');
 
@@ -9,6 +10,11 @@ server.set('port', process.env.PORT || 4000);
 //Middlewares
 server.use(cors());
 server.use(express.json());
+server.use(session({
+    secret: "cars-app",
+    resave: false,
+    saveUninitialized: false
+}));
 
 //Routes
 server.use('/api/cars', require('./routes/cars'));

@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import {Link} from 'react-router-dom';
 import axios from 'axios';
 import config from '../config.json';
+import {ToastContainer, toast} from 'react-toastify';
 
 class Login extends Component {
     state = {
@@ -16,15 +17,23 @@ class Login extends Component {
 
     handleLogin = async () => {
         const {username, password} = this.state;
-        await axios.post(config.apiUrl + '/login', {
+        const response = await axios.post(config.apiUrl + '/login', {
             username: username,
             password: password
         });
+        if (response.data.result === "success") {
+            window.sessionStorage.setItem('token', response.data.token);
+            this.props.history.push('/home');
+        }
+        else if (response.data.result === "fail") {
+            toast.error("Login error");
+        }
     }
 
     render() { 
         return (
             <div className="loginContent">
+                <ToastContainer position="top-right"/>
                 <div className="formFields">
                     <h1 className="title">Login</h1>
                     <div className="form-group">

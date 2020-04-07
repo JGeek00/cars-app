@@ -1,12 +1,14 @@
 const User = require('../models/User');
 const jwt = require('jsonwebtoken');
-const verifyToken = require('./verifyToken');
 
 const usersCtrl = {};
 
 usersCtrl.getUsers = async (req, res) => {
-    const users = await User.find().sort({name: 1});
-    res.json(users);
+    const tokenVal = req.user_token_id;
+    if (tokenVal) {
+        const users = await User.find().sort({name: 1});
+        res.json(users);
+    }
 };
 
 usersCtrl.createUser = async (req, res) => {
@@ -34,7 +36,7 @@ usersCtrl.createUser = async (req, res) => {
             });
         } catch (error) {
             res.status(400).json({
-                result: "success",
+                result: "fail",
                 message: error.message
             });
         }
@@ -42,38 +44,47 @@ usersCtrl.createUser = async (req, res) => {
 }
 
 usersCtrl.getUser = async (req, res) => {
-    const id = req.params.id;
-    const user = await User.findById(id);
-    res.json(user);
+    const tokenVal = req.user_token_id;
+    if (tokenVal) {
+        const id = req.params.id;
+        const user = await User.findById(id);
+        res.json(user);
+    }
 };
 
 usersCtrl.updateUser = async (req, res) => {
-    const id = req.params.id;
-    const {username, password, name, surname, email} = req.body;
-
-    const user = await User.findOneAndUpdate({_id: id}, {
-        username: username,
-        password: password,
-        name: name,
-        surname: surname,
-        email: email
-    });
-    if (user) {
-        res.json({
-            result: "success"
+    const tokenVal = req.user_token_id;
+    if (tokenVal) {
+        const id = req.params.id;
+        const {username, password, name, surname, email} = req.body;
+    
+        const user = await User.findOneAndUpdate({_id: id}, {
+            username: username,
+            password: password,
+            name: name,
+            surname: surname,
+            email: email
         });
-    }
-    else {
-        res.status(400).json({
-            result: "fail"
-        });
+        if (user) {
+            res.json({
+                result: "success"
+            });
+        }
+        else {
+            res.status(400).json({
+                result: "fail"
+            });
+        }
     }
 }
 
 usersCtrl.deleteUser = async (req, res) => {
-    const id = req.params.id;
-    await User.findByIdAndDelete(id);
-    res.json();
+    const tokenVal = req.user_token_id;
+    if (tokenVal) {
+        const id = req.params.id;
+        await User.findByIdAndDelete(id);
+        res.json();
+    }
 };
 
 usersCtrl.register = async (req, res) => {
@@ -105,17 +116,14 @@ usersCtrl.register = async (req, res) => {
 }
 
 usersCtrl.userInfo = async (req, res) => {
-    const token = await verifyToken(req);
-    if (token) {
+    const tokenVal = req.user_token_id;
+    if (tokenVal) {
         try {
-            const user = await User.findById(token, {password: 0});
+            const user = await User.findById(tokenVal, {password: 0});
             res.json(user);
         } catch (error) {
             res.status(400).send(error.message);
         }   
-    }
-    else {
-        res.status(401).json({result: "fail", message: "no-token"});
     }
 }
 
