@@ -30,8 +30,8 @@ userSchema.methods.encryptPassword = async password => {
     return await bcrypt.hash(password, salt);
 }
 
-userSchema.methods.validatePassword = async function(password) {
-    return await bcrypt.compare(password, this.password);
+userSchema.methods.validatePassword = async function(password, dbPassword) {
+    return await bcrypt.compare(password, dbPassword);
 }
 
 module.exports = model('User', userSchema);

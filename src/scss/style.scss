@@ -4,6 +4,16 @@
 	align-items: center;
 	flex-direction: column;
 	height: 90vh;
+
+	h3 {
+		text-align: center;
+	}
+
+	.buttons {
+		.btn {
+			margin: 10px;
+		}
+	}
 }
 
 
@@ -96,7 +106,7 @@
 .navbar-nav {
 	width: 100%;
 	display: grid !important;
-	grid-template-columns: 90% 10%;
+	grid-template-columns: 80% 20%;
 
 	.mainMenu {
 		grid-column: 1/2;

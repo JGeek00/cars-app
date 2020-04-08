@@ -1,7 +1,7 @@
 const {getCars, createCar, getCar, updateCar, deleteCar} = require('../controllers/cars.controllers');
 const {Router} = require('express');
 const router = Router();
-const verifyToken = require('../controllers/verifyToken');
+const verifyToken = require('../middlewares/verifyToken');
 
 router.route('/')
     .get(verifyToken, getCars)

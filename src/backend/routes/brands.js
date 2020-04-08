@@ -1,7 +1,7 @@
 const {getBrands, createBrand, getBrand, updateBrand, deleteBrand} = require('../controllers/brands.controllers');
 const {Router} = require('express');
 const router = Router();
-const verifyToken = require('../controllers/verifyToken');
+const verifyToken = require('../middlewares/verifyToken');
 
 router.route('/')
     .get(verifyToken, getBrands)

@@ -6,6 +6,7 @@ import FilterList from "./filterList";
 import {paginate} from "../utils/pagination";
 import Pagination from './common/pagination';
 import config from "../config.json";
+import Navbar from './navbar';
 
 class CarsList extends Component {
     state = {
@@ -176,32 +177,35 @@ class CarsList extends Component {
         const {tableHead, brands, selectedBrand, currentPage, selectedPageSize, searchQuery, pageSize} = this.state;
         const { totalCount, cars } = this.getPagedData();
         return(
-            <div className="carsListContent">
-                <div className="filter">
-                    <FilterList data={brands} handleFilter={this.handleFilter} selectedItem={selectedBrand}/>
-                </div>
-                <div className="listContent">
-                    <div className="topElements">
-                        <div className="buttons">
-                            <Link to="carslist/new" className="btn btn-primary">Create car</Link>
-                            <button className="btn btn-primary" onClick={this.handleUpdate}>Refresh</button>
-                        </div>
-                        <div className="searchBox">
-                            <input type="text" className="form-control" id="searchBox" placeholder="Search" value={searchQuery} onChange={this.handleSearch}/>
-                        </div>
+            <div>
+                <Navbar/>
+                <div className="carsListContent">
+                    <div className="filter">
+                        <FilterList data={brands} handleFilter={this.handleFilter} selectedItem={selectedBrand}/>
                     </div>
-                    {
-                        cars.length !== 0 ? (
-                            <div className="table">
-                                <CarsTable data={cars} tableHead={tableHead} api="carslist" handleDelete={this.handleDelete}/>
-                                <Pagination itemsCount={totalCount} pageSize={pageSize} currentPage={currentPage} onPageChange={this.handlePageChange} handleNumItems={this.handleNumItems} numItems={selectedPageSize}/>
+                    <div className="listContent">
+                        <div className="topElements">
+                            <div className="buttons">
+                                <Link to="carslist/new" className="btn btn-primary">Create car</Link>
+                                <button className="btn btn-primary" onClick={this.handleUpdate}>Refresh</button>
                             </div>
-                        ) : (
-                            <div className="titleNoCars">
-                                <h3>There are no cars available</h3>
+                            <div className="searchBox">
+                                <input type="text" className="form-control" id="searchBox" placeholder="Search" value={searchQuery} onChange={this.handleSearch}/>
                             </div>
-                        )
-                    }
+                        </div>
+                        {
+                            cars.length !== 0 ? (
+                                <div className="table">
+                                    <CarsTable data={cars} tableHead={tableHead} api="carslist" handleDelete={this.handleDelete}/>
+                                    <Pagination itemsCount={totalCount} pageSize={pageSize} currentPage={currentPage} onPageChange={this.handlePageChange} handleNumItems={this.handleNumItems} numItems={selectedPageSize}/>
+                                </div>
+                            ) : (
+                                <div className="titleNoCars">
+                                    <h3>There are no cars available</h3>
+                                </div>
+                            )
+                        }
+                    </div>
                 </div>
             </div>
         )

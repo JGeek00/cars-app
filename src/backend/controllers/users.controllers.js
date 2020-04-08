@@ -56,21 +56,28 @@ usersCtrl.updateUser = async (req, res) => {
     const tokenVal = req.user_token_id;
     if (tokenVal) {
         const id = req.params.id;
-        const {username, password, name, surname, email} = req.body;
-    
-        const user = await User.findOneAndUpdate({_id: id}, {
-            username: username,
-            password: password,
-            name: name,
-            surname: surname,
-            email: email
-        });
-        if (user) {
-            res.json({
-                result: "success"
+        const {username, name, surname, email} = req.body;
+
+        try {
+            const {password} = await User.findById(id);
+            const user = await User.findOneAndUpdate({_id: id}, {
+                username: username,
+                password: password,
+                name: name,
+                surname: surname,
+                email: email
             });
-        }
-        else {
+            if (user) {
+                res.json({
+                    result: "success"
+                });
+            }
+            else {
+                res.status(400).json({
+                    result: "fail"
+                });
+            }
+        } catch (error) {
             res.status(400).json({
                 result: "fail"
             });
@@ -82,8 +89,22 @@ usersCtrl.deleteUser = async (req, res) => {
     const tokenVal = req.user_token_id;
     if (tokenVal) {
         const id = req.params.id;
-        await User.findByIdAndDelete(id);
-        res.json();
+        if (tokenVal.id != id) {
+            try {
+                await User.findByIdAndDelete(id);
+                res.json({result: "success"});
+            } catch (error) {
+                res.status(400).json({
+                    result: 'fail'
+                });
+            }
+        }
+        else {
+            res.json({
+                result: 'fail',
+                message: 'same-user'
+            });
+        }
     }
 };
 
@@ -131,13 +152,13 @@ usersCtrl.login = async (req, res) => {
     const {username, password} = req.body;
     const user = await User.findOne({username: username});
     if (user) {
-        const valPassword = user.validatePassword(password);
+        const valPassword = await user.validatePassword(password, user.password);
         if (valPassword) {
             const token = await jwt.sign({id: user._id}, 'cars-app', {expiresIn: 60*60*24});
             res.send({result: "success", token: token});
         }
         else {
-            res.status(401).send({result: "fail", message: "password-not-match"});
+            res.send({result: "fail", message: "password-not-match"});
         }
     }
     else {
@@ -145,8 +166,36 @@ usersCtrl.login = async (req, res) => {
     }
 }
 
-usersCtrl.logout = async (req, res) => {
+usersCtrl.getProfile = async (req, res) => {
+    const tokenVal = req.user_token_id;
+    if (tokenVal) {
+        try {
+            const user = await User.findById(tokenVal.id, {password: 0});
+            res.json(user);
+        } catch (error) {
+            res.status(400).send(error.message);
+        }   
+    }
+}
 
-};
+usersCtrl.updateProfile = async (req, res) => {
+    const tokenVal = req.user_token_id;
+    if (tokenVal) {
+        try {
+            const {username, name, surname, email} = req.body;
+            const {password} = await User.findById(tokenVal.id);
+            const user = await User.findOneAndUpdate({_id: tokenVal.id}, {
+                username: username,
+                password: password,
+                name: name,
+                surname: surname,
+                email: email
+            });
+            res.json({result: "success"});
+        } catch (error) {
+            res.status(400).send(error.message);
+        }   
+    }
+}
 
 module.exports = usersCtrl;

@@ -25,8 +25,8 @@ class Login extends Component {
             window.sessionStorage.setItem('token', response.data.token);
             this.props.history.push('/home');
         }
-        else if (response.data.result === "fail") {
-            toast.error("Login error");
+        else if (response.data.result === "fail" && response.data.message === "password-not-match") {
+            toast.error("Invalid password");
         }
     }
 
@@ -42,7 +42,7 @@ class Login extends Component {
                     </div>
                     <div className="form-group">
                         <label htmlFor="passwordInput">Password</label>
-                        <input type="text" className="form-control" name="password" id="passwordInput" onChange={this.handleChange}/>
+                        <input type="password" className="form-control" name="password" id="passwordInput" onChange={this.handleChange}/>
                     </div>
                     <button className="btn btn-primary" onClick={this.handleLogin}>Login</button>
                     <Link to="/register" className="register-button btn btn-primary">Register</Link>

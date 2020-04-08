@@ -3,6 +3,7 @@ import BrandsTable from './brandsTable';
 import axios from 'axios';
 import config from '../config.json';
 import {Link} from 'react-router-dom';
+import Navbar from './navbar';
 
 class BrandsList extends Component {
     state = {
@@ -26,12 +27,15 @@ class BrandsList extends Component {
     render() { 
         const {brands} = this.state;
         return (
-            <div className="contentBrandsList">
-                <div className="contentTop">
-                    <Link to="brands/new" className="btn btn-primary">Create brand</Link>
-                </div>
-                <div>
-                    <BrandsTable brands={brands}/>
+            <div>
+                <Navbar/>
+                <div className="contentBrandsList">
+                    <div className="contentTop">
+                        <Link to="brands/new" className="btn btn-primary">Create brand</Link>
+                    </div>
+                    <div>
+                        <BrandsTable brands={brands}/>
+                    </div>
                 </div>
             </div>
         );

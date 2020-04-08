@@ -5,6 +5,12 @@
   flex-direction: column;
   height: 90vh;
 }
+.homeContent h3 {
+  text-align: center;
+}
+.homeContent .buttons .btn {
+  margin: 10px;
+}
 
 .carsListContent {
   padding: 20px;
@@ -82,7 +88,7 @@
 .navbar-nav {
   width: 100%;
   display: grid !important;
-  grid-template-columns: 90% 10%;
+  grid-template-columns: 80% 20%;
 }
 .navbar-nav .mainMenu {
   grid-column: 1/2;

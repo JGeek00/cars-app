@@ -20,9 +20,9 @@ server.use(session({
 server.use('/api/cars', require('./routes/cars'));
 server.use('/api/brands', require('./routes/brands'));
 server.use('/api/users', require('./routes/users'));
-server.use('/api/dashboard', require('./routes/dashboard'));
 server.use('/api/login', require('./routes/login'));
 server.use('/api/register', require('./routes/register'));
+server.use('/api/profile', require('./routes/profile'));
 
 
 module.exports = server;
