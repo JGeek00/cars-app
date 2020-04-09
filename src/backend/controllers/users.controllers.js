@@ -160,7 +160,7 @@ usersCtrl.login = async (req, res) => {
     if (user) {
         const valPassword = await user.validatePassword(password, user.password);
         if (valPassword) {
-            const token = await jwt.sign({id: user._id}, 'cars-app', {expiresIn: 60*60*24});
+            const token = await jwt.sign({id: user._id}, process.env.AUTH_KEY, {expiresIn: 60*60*24});
             res.send({result: "success", userData: user, token: token});
         }
         else {
