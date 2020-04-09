@@ -20,7 +20,13 @@ class Home extends Component {
                         <div className="buttons">
                             <Link className="btn btn-primary" to="/carslist">Cars list</Link>
                             <Link className="btn btn-primary" to="/brands">Brands</Link>
-                            <Link className="btn btn-primary" to="/users">Users</Link>
+                            {
+                                this.props.userType === "admin" ? (
+                                    <Link className="btn btn-primary" to="/users">Users</Link>
+                                ) : (
+                                    <React.Fragment/>
+                                )
+                            } 
                         </div>
                     )
                 } 

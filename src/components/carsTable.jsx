@@ -23,7 +23,15 @@ class CarsTable extends Component {
                             <tr key={element._id}>
                                 <td><Link to={`/${api}/${element._id}`}>{element.model}</Link></td>
                                 <td>{element.brand.map(brand => brand.name)}</td>
-                                <td><Delete id={element._id} data={data} handleDelete={handleDelete}/></td>
+                                <td>
+                                    {
+                                        this.props.userType === "admin" ? (
+                                            <Delete id={element._id} data={data} handleDelete={handleDelete}/>
+                                        ) : (
+                                            <React.Fragment/>
+                                        )
+                                    }
+                                </td>
                             </tr>
                         ))
                     }

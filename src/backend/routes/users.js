@@ -5,7 +5,7 @@ const verifyToken = require('../middlewares/verifyToken');
 
 router.route('/')
     .get(verifyToken, getUsers)
-    .post(createUser)
+    .post(verifyToken, createUser)
 
 router.route('/:id')
     .get(verifyToken, getUser)

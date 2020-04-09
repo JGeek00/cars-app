@@ -95,15 +95,25 @@ class CarForm extends Component {
         return (
             <div className="addFormContent">
                 <ToastContainer position="top-right"/>
-                <h3>Add a new car</h3>
+                {
+                    this.props.userType === "user" ? (
+                        <h3>Car info</h3>
+                    ) : (
+                        this.props.match.params.id === "new" ? (
+                            <h3>Add a new car</h3>
+                        ) : (
+                            <h3>Edit this car</h3>
+                        )
+                    )
+                }
                 <form>
                     <div className="form-group">
                         <label htmlFor="model">Model</label>
-                        <input type="text" className="form-control" name="model" id="model" value={model} onChange={this.handleChange}/>
+                        <input type="text" className="form-control" name="model" id="model" value={model} onChange={this.handleChange} disabled={this.props.userType === "admin" ? '' : 'disabled'}/>
                     </div>
                     <div className="form-group">
-                        <select className="custom-select" name="brand" onChange={this.handleChange}>
-                            <option selected={brand === "" ? "selected" : ""} value="">Select a brand</option>
+                        <select className="custom-select" name="brand" onChange={this.handleChange} disabled={this.props.userType === "admin" ? '' : 'disabled'}>
+                            <option value={brand === "" ? "selected" : ""}>Select a brand</option>
                             {
                                 brands.map(oneBrand => (
                                     <option selected={brand === oneBrand._id ? "selected" : ""} value={oneBrand._id} key={oneBrand._id}>{oneBrand.name}</option>
@@ -111,7 +121,13 @@ class CarForm extends Component {
                             }
                         </select>
                     </div>
-                    <button type="button" className="btn btn-primary" onClick={this.handleUpdate}>Save</button>
+                    {
+                        this.props.userType === "admin" ? (
+                            <button type="button" className="btn btn-primary" onClick={this.handleUpdate}>Save</button>
+                        ) : (
+                            <React.Fragment/>
+                        )
+                    }
                 </form>
             </div>
         )

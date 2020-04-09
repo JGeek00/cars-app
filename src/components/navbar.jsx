@@ -33,11 +33,17 @@ class Navbar extends Component {
                                     Brands list
                                 </NavLink>
                             </li>
-                            <li className="nav-item">
-                                <NavLink className="nav-item nav-link" to="/users">
-                                    Users list
-                                </NavLink>
-                            </li>
+                            {
+                                this.props.userType === "admin" ? (
+                                    <li className="nav-item">
+                                        <NavLink className="nav-item nav-link" to="/users">
+                                            Users list
+                                        </NavLink>
+                                    </li>
+                                ) : (
+                                    <React.Fragment/>
+                                )
+                            }
                         </div>
                         <div className="loginMenu">
                             <li className="nav-item">

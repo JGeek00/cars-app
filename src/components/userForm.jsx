@@ -10,6 +10,7 @@ class UserForm extends Component {
         name: "",
         surname:"",
         email: "",
+        userType: "",
         username: "", 
         password: "",
         pageTitle: "",
@@ -20,6 +21,10 @@ class UserForm extends Component {
         const token = window.sessionStorage.getItem('token');
         if (!token) {
             this.props.history.push('/login');
+        }
+
+        if (this.props.userType !== "admin") {
+            this.props.history.push('/home');
         }
 
         const id = this.props.match.params.id;
@@ -39,6 +44,7 @@ class UserForm extends Component {
                 name: user.data.name,
                 surname: user.data.surname,
                 email: user.data.email,
+                userType: user.data.type,
                 username: user.data.username,
                 pageTitle: "Edit an user",
                 submit: false
@@ -53,13 +59,14 @@ class UserForm extends Component {
     }
 
     handleUpdate = async () => {
-        const {id, name, surname, email, username, password} = this.state;
-        if (id !== "" && name !== "" && surname !== "" && email !== "" && username !== "") {
+        const {id, name, surname, email, userType, username, password} = this.state;
+        if (id !== "" && name !== "" && surname !== "" && email !== "" && userType !== "" && username !== "") {
             if (id === "new") {
                 const updatedUser = {
                     "name": name,
                     "surname": surname,
                     "email": email,
+                    "userType": userType,
                     "username": username, 
                     "password": password
                 }
@@ -92,6 +99,7 @@ class UserForm extends Component {
                     "name": name,
                     "surname": surname,
                     "email": email,
+                    "userType": userType,
                     "username": username
                 }
                 try {
@@ -122,7 +130,7 @@ class UserForm extends Component {
         const state = this.state;
         const { name, value } = e.target;
         this.setState({ [name]: value });
-        if (state.id !== "" && state.name !== "" && state.surname !== "" && state.email !== "" && state.username !== "") {
+        if (state.id !== "" && state.name !== "" && state.surname !== "" && state.email !== "" && state.user !== "" && state.username !== "") {
             this.setState({submit: false});
         }
         else {
@@ -131,9 +139,9 @@ class UserForm extends Component {
     }
 
     render() {
-        const {id, name, surname, email, username, password, pageTitle, submit} = this.state;
+        const {id, name, surname, email, userType, username, password, pageTitle, submit} = this.state;
         return (
-            <div className="addFormContent">
+            <div className="createUserForm">
                 <ToastContainer position="top-right"/>
                 <h3>{pageTitle}</h3>
                 <form>
@@ -149,6 +157,11 @@ class UserForm extends Component {
                         <label htmlFor="email">Email</label>
                         <input type="email" className="form-control" name="email" id="email" value={email} onChange={this.handleChange}/>
                     </div>
+                    <select className="custom-select" name="userType" onChange={this.handleChange} value={userType}>
+                        <option value="">Select a type</option>
+                        <option value="user">User</option>
+                        <option value="admin">Admin</option>
+                    </select>
                     <div className="form-group">
                         <label htmlFor="username">Username</label>
                         <input type="text" className="form-control" name="username" id="username" value={username} onChange={this.handleChange}/>

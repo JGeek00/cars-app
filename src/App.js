@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Component } from 'react';
 
 import Home from "./components/home";
 import CarsList from "./components/carsList";
@@ -13,37 +13,85 @@ import BrandsList from './components/brandsList';
 import BrandsForm from './components/brandsForm';
 
 import { Route, Redirect, Switch } from "react-router-dom";
+import axios from 'axios';
+import config from './config.json';
 import 'react-toastify/dist/ReactToastify.css';
 
 import './css/App.css';
 
 
+class App extends Component {
+	state = {
+		user: {}
+	}
 
+	async componentDidMount() {
+		const token = window.sessionStorage.getItem('token');
+		if (token) {
+			const user = await axios.get(config.apiUrl + '/profile', {
+				headers: {
+					'x-access-token': token
+				}
+			});
+			if (user.data.result === "fail" && user.data.message === "no-token") {
+				window.sessionStorage.removeItem('token');
+				this.props.history.push('/login');
+			}
+			this.setState({
+				user: user.data
+			});
+		}
+	}
 
-function App() {
-	return (
-		<React.Fragment>
-			<div>
-				<Switch>
-					<Route path="/brands/:id" component={BrandsForm}/>
-					<Route path="/brands" component={BrandsList}/>
-					<Route path="/users/:id" component={UserForm}/>
-					<Route path="/users/new" component={UserForm}/>
-					<Route path="/users" component={UserList}/>
-					<Route path="carslist/new" component={CarForm}/>
-					<Route path="/carslist/:id" component={CarForm}/>
-					<Route path="/carslist" component={CarsList}/>
-					<Route path="/profile" component={Profile}/>
-					<Route path="/login" component={Login}/>
-					<Route path="/register" component={Register}/>
-					<Route path="/home" component={Home}/>
-					<Route path="/not-found" component={NotFound} />
-					<Redirect from="/" exact to="/home" />
-					<Redirect to="/not-found" />
-				</Switch>
-			</div>
-		</React.Fragment>
-	);
+	onLogin = (user) => {
+		this.setState({user: user});
+	}
+
+	render() {
+		return (
+			<React.Fragment>
+				<div>
+					<Switch>
+						<Route path="/brands/:id" render={
+							props => <BrandsForm {...props} userType={this.state.user.type}/>
+						}/>
+						<Route path="/brands" render={
+							props => <BrandsList {...props} userType={this.state.user.type}/>
+						}/>
+						<Route path="/users/:id" render={
+							props => <UserForm {...props} userType={this.state.user.type}/>
+						}/>
+						<Route path="/users/new" render={
+							props => <UserForm {...props} userType={this.state.user.type}/>
+						}/>
+						<Route path="/users" render={
+							props => <UserList {...props} userType={this.state.user.type}/>
+						}/>
+						<Route path="carslist/new" render={
+							props => <CarForm {...props} userType={this.state.user.type}/>
+						}/>
+						<Route path="/carslist/:id" render={
+							props => <CarForm {...props} userType={this.state.user.type}/>
+						}/>
+						<Route path="/carslist" render={
+							props => <CarsList {...props} userType={this.state.user.type}/>
+						}/>
+						<Route path="/profile" component={Profile}/>
+						<Route path="/login" render={
+							props => <Login {...props} onLogin={this.onLogin}/>
+						}/>
+						<Route path="/register" component={Register}/>
+						<Route path="/home" render={
+							props => <Home {...props} userType={this.state.user.type}/>
+						}/>
+						<Route path="/not-found" component={NotFound} />
+						<Redirect from="/" exact to="/home" />
+						<Redirect to="/not-found" />
+					</Switch>
+				</div>
+			</React.Fragment>
+		);
+	}
 }
 
 export default App;

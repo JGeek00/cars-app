@@ -37,8 +37,8 @@
   margin-bottom: 10px;
   width: 50%;
 }
-.carsListContent .listContent .topElements .buttons button {
-  margin-left: 10px;
+.carsListContent .listContent .topElements .buttons .btnNew {
+  margin-right: 10px;
 }
 .carsListContent .listContent .topElements .searchBox {
   box-sizing: border-box;
@@ -125,15 +125,7 @@
 
 .usersListContent {
   padding: 20px;
-  display: grid;
-  grid-template-columns: 20% 80%;
-}
-.usersListContent .filter {
-  grid-column: 1/2;
-  margin-right: 50px;
-}
-.usersListContent .table {
-  grid-column: 2/3;
+  display: flex;
 }
 .usersListContent .table .buttons {
   box-sizing: border-box;
@@ -148,6 +140,14 @@
   box-sizing: border-box;
   float: left;
   width: 50%;
+}
+
+.createUserForm {
+  padding: 20px;
+}
+.createUserForm select {
+  margin-top: 20px;
+  margin-bottom: 20px;
 }
 
 .contentBrandsList {

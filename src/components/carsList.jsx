@@ -178,7 +178,7 @@ class CarsList extends Component {
         const { totalCount, cars } = this.getPagedData();
         return(
             <div>
-                <Navbar/>
+                <Navbar userType={this.props.userType}/>
                 <div className="carsListContent">
                     <div className="filter">
                         <FilterList data={brands} handleFilter={this.handleFilter} selectedItem={selectedBrand}/>
@@ -186,7 +186,13 @@ class CarsList extends Component {
                     <div className="listContent">
                         <div className="topElements">
                             <div className="buttons">
-                                <Link to="carslist/new" className="btn btn-primary">Create car</Link>
+                                {
+                                    this.props.userType === "admin" ? (
+                                        <Link to="carslist/new" className="btn btn-primary btnNew">Create car</Link>
+                                    ) : (
+                                    <React.Fragment/>
+                                    )
+                                }
                                 <button className="btn btn-primary" onClick={this.handleUpdate}>Refresh</button>
                             </div>
                             <div className="searchBox">
@@ -196,7 +202,7 @@ class CarsList extends Component {
                         {
                             cars.length !== 0 ? (
                                 <div className="table">
-                                    <CarsTable data={cars} tableHead={tableHead} api="carslist" handleDelete={this.handleDelete}/>
+                                    <CarsTable data={cars} tableHead={tableHead} api="carslist" handleDelete={this.handleDelete} userType={this.props.userType}/>
                                     <Pagination itemsCount={totalCount} pageSize={pageSize} currentPage={currentPage} onPageChange={this.handlePageChange} handleNumItems={this.handleNumItems} numItems={selectedPageSize}/>
                                 </div>
                             ) : (

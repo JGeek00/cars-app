@@ -12,33 +12,37 @@ usersCtrl.getUsers = async (req, res) => {
 };
 
 usersCtrl.createUser = async (req, res) => {
-    const {username, password, name, surname, email} = req.body;
-    const user = new User({
-        username: username,
-        password: password,
-        name: name,
-        surname: surname,
-        email: email
-    });
-    user.password = await user.encryptPassword(password);
-    const exists = await User.findOne({username: username});
-    if (exists) {
-        res.json({
-            result: "fail",
-            message: 'username-not-available'
+    const tokenVal = req.user_token_id;
+    if (tokenVal) {
+        const {username, password, name, surname, email, userType} = req.body;
+        const user = new User({
+            username: username,
+            password: password,
+            name: name,
+            surname: surname,
+            email: email, 
+            type: userType
         });
-    }
-    else {
-        try {
-            await user.save();
+        user.password = await user.encryptPassword(password);
+        const exists = await User.findOne({username: username});
+        if (exists) {
             res.json({
-                result: "success"
-            });
-        } catch (error) {
-            res.status(400).json({
                 result: "fail",
-                message: error.message
+                message: 'username-not-available'
             });
+        }
+        else {
+            try {
+                await user.save();
+                res.json({
+                    result: "success"
+                });
+            } catch (error) {
+                res.status(400).json({
+                    result: "fail",
+                    message: error.message
+                });
+            }
         }
     }
 }
@@ -56,7 +60,7 @@ usersCtrl.updateUser = async (req, res) => {
     const tokenVal = req.user_token_id;
     if (tokenVal) {
         const id = req.params.id;
-        const {username, name, surname, email} = req.body;
+        const {username, name, surname, email, userType} = req.body;
 
         try {
             const {password} = await User.findById(id);
@@ -65,7 +69,8 @@ usersCtrl.updateUser = async (req, res) => {
                 password: password,
                 name: name,
                 surname: surname,
-                email: email
+                email: email,
+                type: userType
             });
             if (user) {
                 res.json({
@@ -120,7 +125,8 @@ usersCtrl.register = async (req, res) => {
             password: password, 
             name: name,
             surname: surname,
-            email: email
+            email: email, 
+            type: "user"
         });
         newUser.password = await newUser.encryptPassword(password);
         try {
@@ -155,7 +161,7 @@ usersCtrl.login = async (req, res) => {
         const valPassword = await user.validatePassword(password, user.password);
         if (valPassword) {
             const token = await jwt.sign({id: user._id}, 'cars-app', {expiresIn: 60*60*24});
-            res.send({result: "success", token: token});
+            res.send({result: "success", userData: user, token: token});
         }
         else {
             res.send({result: "fail", message: "password-not-match"});

@@ -1,2 +1,3 @@
-{"_id":{"$oid":"5e85f9231270df6182815326"},"username":"admin","password":"password","name":"admin","surname":"admin","email":"admin@admin.com","__v":{"$numberInt":"0"}}
-{"_id":{"$oid":"5e85f9a01270df6182815327"},"username":"user","password":"password","name":"user","surname":"user","email":"user@user.com","__v":{"$numberInt":"0"}}
+{"_id":{"$oid":"5e8b5917224fc84d38836a40"},"username":"admin","password":"$2a$10$aJo8uasWs0mHNJe.ATkrr.nMR9.gGINGmEq/1Fq9xeaQ1jWZTZZUC","name":"admin","surname":"admin","email":"admin@admin.com","__v":{"$numberInt":"0"}}
+{"_id":{"$oid":"5e8dfef9bda0238e327a9b14"},"username":"user","password":"$2a$10$AfWZr9sZb72wvq112dVSJuOHd2jcco85MEDkDevxLkeDDskR6Q2Qe","name":"user","surname":"user","email":"user@user.com","__v":{"$numberInt":"0"}}
+{"_id":{"$oid":"5e8f111d8ab085a92e4e0fc1"},"username":"user2","password":"$2a$10$fiDt6iA6CEyTudxAUglt..r0OI1TIWiwb08/6HjKTD.ni.9Ug3cg6","name":"user2","surname":"user2","email":"user2@user.com","__v":{"$numberInt":"0"}}

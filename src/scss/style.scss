@@ -43,8 +43,8 @@
 				margin-bottom: 10px;
 				width: 50%;
 	
-				button {
-					margin-left: 10px;
+				.btnNew {
+					margin-right: 10px;
 				}
 			}
 	
@@ -151,16 +151,9 @@
 
 .usersListContent {
 	padding: 20px;
-	display: grid;
-	grid-template-columns: 20% 80%;
-
-	.filter {
-		grid-column: 1/2;
-		margin-right: 50px;
-	}
+	display: flex;
 
 	.table {
-		grid-column: 2/3;
 
 		.buttons {
 			box-sizing: border-box;
@@ -179,6 +172,14 @@
 			width: 50%;
 		}
   	}
+}
+
+.createUserForm {
+	padding: 20px;
+	select {
+		margin-top: 20px;
+		margin-bottom: 20px;
+	}
 }
 
 .contentBrandsList {

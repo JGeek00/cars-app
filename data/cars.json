@@ -31,3 +31,5 @@
 {"_id":{"$oid":"5e832d761425f62b81158221"},"model":"BMW Serie 2","brand":{"$oid":"5e7a71e7e0d9bf93cd85a5cf"},"__v":{"$numberInt":"0"}}
 {"_id":{"$oid":"5e832d7e1425f62b81158222"},"model":"BMW i8","brand":{"$oid":"5e7a71e7e0d9bf93cd85a5cf"},"__v":{"$numberInt":"0"}}
 {"_id":{"$oid":"5e832d8b1425f62b81158223"},"model":"BMW Serie 4","brand":{"$oid":"5e7a71e7e0d9bf93cd85a5cf"},"__v":{"$numberInt":"0"}}
+{"_id":{"$oid":"5e8c9f188c57916d41db9492"},"model":"Audi RS7","brand":{"$oid":"5e7a746ca2eeef941282957b"},"__v":{"$numberInt":"0"}}
+{"_id":{"$oid":"5e8c9f298c57916d41db9493"},"model":"Opel Corsa","brand":{"$oid":"5e86fe87f3dc116ed11f8aec"},"__v":{"$numberInt":"0"}}

@@ -75,13 +75,29 @@ class BradsForm extends Component {
         return (
             <div className="addFormContent">
                 <ToastContainer position="top-right"/>
-                <h3>Add a new brand</h3>
+                {
+                    this.props.userType === "admin" ? (
+                        this.props.match.params.id === "new" ? (
+                            <h3>Create a new brand</h3>
+                        ) : (
+                            <h3>Edit a brand</h3>
+                        )
+                    ) : (
+                        <h3>Brand info</h3>
+                    )
+                }
                 <form>
                     <div className="form-group">
                         <label htmlFor="name">Name</label>
-                        <input type="text" className="form-control" name="name" id="name" value={name} onChange={this.handleChange}/>
+                        <input type="text" className="form-control" name="name" id="name" value={name} onChange={this.handleChange} disabled={this.props.userType === "admin" ? "" : 'disabled'}/>
                     </div>
-                    <button type="button" className="btn btn-primary" onClick={this.handleUpdate}>Save</button>
+                    {
+                        this.props.userType === "admin" ? (
+                            <button type="button" className="btn btn-primary" onClick={this.handleUpdate}>Save</button>
+                        ) : (
+                            <React.Fragment/>
+                        )
+                    }
                 </form>
             </div>
         );

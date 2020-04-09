@@ -17,6 +17,10 @@ class UserList extends Component {
         if (!token) {
             this.props.history.push('/login');
         }
+
+        if (this.props.userType !== "admin") {
+            this.props.history.push('/home');
+        }
     
         const users = await axios.get(config.apiUrl + "/users", {
             headers: {
@@ -124,7 +128,7 @@ class UserList extends Component {
         const {users, tableHead} = this.state;
         return (
             <div>
-                <Navbar/>
+                <Navbar userType={this.props.userType}/>
                 <ToastContainer position="top-right"/>
                 <div className="usersListContent">
                     <div className="table">

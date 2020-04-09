@@ -28,10 +28,16 @@ class BrandsList extends Component {
         const {brands} = this.state;
         return (
             <div>
-                <Navbar/>
+                <Navbar userType={this.props.userType}/>
                 <div className="contentBrandsList">
                     <div className="contentTop">
-                        <Link to="brands/new" className="btn btn-primary">Create brand</Link>
+                        {
+                            this.props.userType === "admin" ? (
+                                <Link to="brands/new" className="btn btn-primary">Create brand</Link>
+                            ) : (
+                                <React.Fragment/>
+                            )
+                        }
                     </div>
                     <div>
                         <BrandsTable brands={brands}/>

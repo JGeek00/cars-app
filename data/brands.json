@@ -7,5 +7,4 @@
 {"_id":{"$oid":"5e7a749ea2eeef941282957f"},"name":"Mercedes"}
 {"_id":{"$oid":"5e7b4ef8d29641a2511827d9"},"name":"Porsche"}
 {"_id":{"$oid":"5e86fe87f3dc116ed11f8aec"},"name":"Opel","__v":{"$numberInt":"0"}}
-{"_id":{"$oid":"5e86ff38f52aba6ef2446ca4"},"name":"Jaguar","__v":{"$numberInt":"0"}}
-{"_id":{"$oid":"5e8735bfa5ab2d72a06e32c8"},"name":"Ford","__v":{"$numberInt":"0"}}
+{"_id":{"$oid":"5e8ca5acdc3d116dea61b915"},"name":"Ford","__v":{"$numberInt":"0"}}

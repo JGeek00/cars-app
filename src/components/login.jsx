@@ -23,6 +23,7 @@ class Login extends Component {
         });
         if (response.data.result === "success") {
             window.sessionStorage.setItem('token', response.data.token);
+            this.props.onLogin(response.data.userData);
             this.props.history.push('/home');
         }
         else if (response.data.result === "fail" && response.data.message === "password-not-match") {
