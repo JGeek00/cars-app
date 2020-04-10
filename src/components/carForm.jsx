@@ -1,6 +1,7 @@
 import React, {Component} from "react";
 import axios from "axios";
 import { toast, ToastContainer } from 'react-toastify';
+import config from '../config.json';
 
 class CarForm extends Component {
     state = {
@@ -17,14 +18,14 @@ class CarForm extends Component {
         }
 
         const id = this.props.match.params.id;
-        const brands = await axios.get('http://localhost:4000/api/brands', {
+        const brands = await axios.get(config.apiUrl + '/brands', {
             headers: {
                 'x-access-token': token
             }
         });
         this.setState({brands: brands.data});
         if (id !== "new") {
-            const car = await axios.get('http://localhost:4000/api/cars/'+id, {
+            const car = await axios.get(config.apiUrl + '/cars/'+id, {
                 headers: {
                     'x-access-token': token
                 }
@@ -50,7 +51,7 @@ class CarForm extends Component {
             "brand": brand
         }
         if (id === "new") {
-            const result = await axios.post('http://localhost:4000/api/cars', updatedCar, {
+            const result = await axios.post(config.apiUrl + '/cars', updatedCar, {
                 headers: {
                     'x-access-token': token
                 }
@@ -67,7 +68,7 @@ class CarForm extends Component {
             }
         }
         else {
-            const result = await axios.put('http://localhost:4000/api/cars/' + id, updatedCar, {
+            const result = await axios.put(config.apiUrl + '/cars/' + id, updatedCar, {
                 headers: {
                     'x-access-token': token
                 }
