@@ -68,7 +68,7 @@ class CarForm extends Component {
             }
         }
         else {
-            const result = await axios.put(config.apiUrl + '/cars/' + id, updatedCar, {
+            const result = await axios.put('http://localhost:4000/api/cars/' + id, updatedCar, {
                 headers: {
                     'x-access-token': token
                 }
