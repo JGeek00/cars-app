@@ -14,12 +14,9 @@ It is an application which provices information about some cars. That data is st
 npm start
 ```
 
-### Starting the api server
+### Backend server
 
-```bash
-cd src/backend
-node start.js
-```
+The backend server code is in a separate repository. You can find it [here](https://github.com/JGeek00/cars-app-backend).
 
 ### Data examples
 
