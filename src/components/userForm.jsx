@@ -1,65 +1,62 @@
-import React, {Component} from "react";
+import React, {useEffect, useState} from 'react';
 import axios from "axios";
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import config from '../config.json';
 
-class UserForm extends Component {
-    state = {
-        id: "",
-        name: "",
-        surname:"",
-        email: "",
-        userType: "",
-        username: "", 
-        password: "",
-        pageTitle: "",
-        submit: true
-    }
+function UserForm (props) {
+    const [id, setId] = useState('');
+    const [name, setName] = useState('');
+    const [surname, setSurname] = useState('');
+    const [email, setEmail] = useState('');
+    const [userType, setUserType] = useState('');
+    const [username, setUsername] = useState('');
+    const [password, setPassword] = useState('');
+    const [pageTitle, setPageTitle] = useState('');
+    const [submit, setSubmit] = useState(true);
 
-    async componentDidMount() {
-        const token = window.sessionStorage.getItem('token');
-        if (!token) {
-            this.props.history.push('/login');
-        }
-
-        if (this.props.userType !== "admin") {
-            this.props.history.push('/home');
-        }
-
-        const id = this.props.match.params.id;
-        if (id !== "new") {
+    useEffect(() => {
+        loadData();
+        async function loadData() {
             const token = window.sessionStorage.getItem('token');
-            const user = await axios.get(config.apiUrl + "/users/"+id, {
-                headers: {
-                    'x-access-token': token
-                }
-            });
-            if (user.data.result === "fail" && user.data.message === "no-token") {
-                window.sessionStorage.removeItem('token');
-                this.props.history.push('/login');
+            if (!token) {
+                props.history.push('/login');
             }
-            this.setState({
-                id: id,
-                name: user.data.name,
-                surname: user.data.surname,
-                email: user.data.email,
-                userType: user.data.type,
-                username: user.data.username,
-                pageTitle: "Edit an user",
-                submit: false
-            });
-        }
-        else {
-            this.setState({
-                id: id,
-                pageTitle: "Create a new user"
-            });
-        }
-    }
+    
+            if (props.userType !== "admin") {
+                props.history.push('/home');
+            }
+    
+            const id = props.match.params.id;
+            if (id !== "new") {
+                const token = window.sessionStorage.getItem('token');
+                const user = await axios.get(config.apiUrl + "/users/"+id, {
+                    headers: {
+                        'x-access-token': token
+                    }
+                });
+                if (user.data.result === "fail" && user.data.message === "no-token") {
+                    window.sessionStorage.removeItem('token');
+                    props.history.push('/login');
+                }
 
-    handleUpdate = async () => {
-        const {id, name, surname, email, userType, username, password} = this.state;
+                setId(id);
+                setName(user.data.name);
+                setSurname(user.data.surname);
+                setEmail(user.data.email);
+                setUserType(user.data.type);
+                setUsername(user.data.username);
+                setPageTitle("Edit an user");
+                setSubmit(false);
+            }
+            else {
+                setId(id);
+                setPageTitle("Create a new user")
+            }
+        }
+    })
+
+    const handleUpdate = async () => {
         if (id !== "" && name !== "" && surname !== "" && email !== "" && userType !== "" && username !== "") {
             if (id === "new") {
                 const updatedUser = {
@@ -79,13 +76,13 @@ class UserForm extends Component {
                     });
                     if (result.data.result === "fail" && result.data.message === "no-token") {
                         window.sessionStorage.removeItem('token');
-                        this.props.history.push('/login');
+                        props.history.push('/login');
                     }
                     else if (result.data.result === "fail" && result.data.message === "username-not-available") {
                         toast.error("This username is not available");
                     }
                     else if (result.data.result === "success") {
-                        this.props.history.push('/users');
+                        props.history.push('/users');
                     }
                     else {
                         toast.error("Error when creating the user");
@@ -111,13 +108,13 @@ class UserForm extends Component {
                     });
                     if (result.data.result === "fail" && result.data.message === "no-token") {
                         window.sessionStorage.removeItem('token');
-                        this.props.history.push('/login');
+                        props.history.push('/login');
                     }
                     else if (result.data.result === "fail" && result.data.message !== "no-token") {
                         toast.error("An error has occurred when updating the user");
                     }
                     else if (result.data.result === "success") {
-                        this.props.history.push('/users');
+                        props.history.push('/users');
                     }
                 } catch (error) {
                     toast.error("An error has occurred when updating the user");
@@ -126,61 +123,81 @@ class UserForm extends Component {
         }
     }
     
-    handleChange = (e) => {
-        const state = this.state;
+    const handleChange = (e) => {
         const { name, value } = e.target;
-        this.setState({ [name]: value });
-        if (state.id !== "" && state.name !== "" && state.surname !== "" && state.email !== "" && state.user !== "" && state.username !== "") {
-            this.setState({submit: false});
+        switch (name) {
+            case "name":
+                setName(value);
+                break;
+
+            case "surname":
+                setSurname(value);
+                break;
+
+            case "email":
+                setEmail(value);
+                break;
+                
+            case "userType":
+                setUserType(value);
+                break;
+
+            case "username":
+                setUsername(value);
+                break;
+
+            case "password":
+                setPassword(value);
+                break;
+        }
+        if (id !== "" && name !== "" && surname !== "" && email !== "" && userType !== "" && username !== "") {
+            setSubmit(false);
         }
         else {
-            this.setState({submit: true});
+            setSubmit(true);
         }
     }
 
-    render() {
-        const {id, name, surname, email, userType, username, password, pageTitle, submit} = this.state;
-        return (
-            <div className="createUserForm">
-                <ToastContainer position="top-right"/>
-                <h3>{pageTitle}</h3>
-                <form>
-                    <div className="form-group">
-                        <label htmlFor="name">Name</label>
-                        <input type="text" className="form-control" name="name" id="name" value={name} onChange={this.handleChange}/>
-                    </div>
-                    <div className="form-group">
-                        <label htmlFor="name">Surname</label>
-                        <input type="text" className="form-control" name="surname" id="surname" value={surname} onChange={this.handleChange}/>
-                    </div>
-                    <div className="form-group">
-                        <label htmlFor="email">Email</label>
-                        <input type="email" className="form-control" name="email" id="email" value={email} onChange={this.handleChange}/>
-                    </div>
-                    <select className="custom-select" name="userType" onChange={this.handleChange} value={userType}>
-                        <option value="">Select a type</option>
-                        <option value="user">User</option>
-                        <option value="admin">Admin</option>
-                    </select>
-                    <div className="form-group">
-                        <label htmlFor="username">Username</label>
-                        <input type="text" className="form-control" name="username" id="username" value={username} onChange={this.handleChange}/>
-                    </div>
-                    {
-                        id === "new" ? (
-                            <div className="form-group">
-                                <label htmlFor="password">Password</label>
-                                <input type="password" className="form-control" name="password" id="password" value={password} onChange={this.handleChange}/>
-                            </div>
-                        ) : (
-                            <div></div>
-                        )
-                    }
-                    <button type="button" className="btn btn-primary" onClick={this.handleUpdate} disabled={submit}>Save</button>
-                </form>
-            </div>
-        )
-    }
+    return (
+        <div className="createUserForm">
+            <ToastContainer position="top-right"/>
+            <h3>{pageTitle}</h3>
+            <form>
+                <div className="form-group">
+                    <label htmlFor="name">Name</label>
+                    <input type="text" className="form-control" name="name" id="name" value={name} onChange={handleChange}/>
+                </div>
+                <div className="form-group">
+                    <label htmlFor="name">Surname</label>
+                    <input type="text" className="form-control" name="surname" id="surname" value={surname} onChange={handleChange}/>
+                </div>
+                <div className="form-group">
+                    <label htmlFor="email">Email</label>
+                    <input type="email" className="form-control" name="email" id="email" value={email} onChange={handleChange}/>
+                </div>
+                <select className="custom-select" name="userType" onChange={handleChange} value={userType}>
+                    <option value="">Select a type</option>
+                    <option value="user">User</option>
+                    <option value="admin">Admin</option>
+                </select>
+                <div className="form-group">
+                    <label htmlFor="username">Username</label>
+                    <input type="text" className="form-control" name="username" id="username" value={username} onChange={handleChange}/>
+                </div>
+                {
+                    id === "new" ? (
+                        <div className="form-group">
+                            <label htmlFor="password">Password</label>
+                            <input type="password" className="form-control" name="password" id="password" value={password} onChange={handleChange}/>
+                        </div>
+                    ) : (
+                        <div></div>
+                    )
+                }
+                <button type="button" className="btn btn-primary" onClick={handleUpdate} disabled={submit}>Save</button>
+            </form>
+        </div>
+    )
 }
 
 export default UserForm
