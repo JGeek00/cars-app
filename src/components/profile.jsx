@@ -11,7 +11,7 @@ function Profile (props) {
     const [email, setEmail] = useState('');
     const [username, setUsername] = useState('');
     const [submit, setSubmit] = useState(true);
-    const [pageTitle, setPageTitle] = useState('Profile');
+    const [pageTitle] = useState('Profile');
 
     useEffect(() => {
         loadData();
@@ -58,6 +58,9 @@ function Profile (props) {
 
             case "username":
                 setUsername(value);
+                break;
+
+            default:
                 break;
         }
         if (id !== "" && name !== "" && surname !== "" && email !== "" && username !== "") {

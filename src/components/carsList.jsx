@@ -8,57 +8,61 @@ import Pagination from './common/pagination';
 import config from "../config.json";
 import Navbar from './navbar';
 
-function CarsList(props) {
-    const [allCars, setAllCars] = useState([]);
-    const [cars, setCars] = useState([]);
+import {connect} from 'react-redux';
+import {setCars, setAllCars, setBrands} from '../store';
+
+const mapDispatch = {setCars, setAllCars, setBrands};
+
+const CarsList = ({userType, history, cars, allCars, brands, setCars, setAllCars, setBrands}) => {
+    console.log("cars1",cars)
     const [tableHead, setTableHead] = useState([]);
-    const [brands, setBrands] = useState([]);
     const [selectedBrand, setSelectedBrand] = useState('');
     const [searchQuery, setSearchQuery] = useState('');
     const [currentPage, setCurrentPage] = useState(1);
     const [pageSize, setPageSize] = useState(8);
 
-    useEffect(() => {
-        loadData();
-        async function loadData() {
-            const token = window.sessionStorage.getItem('token');
-            if (!token) {
-                props.history.push('/login');
-            }
-    
-            const cars = await axios.get(config.apiUrl + "/cars", {
-                headers: {
-                    'x-access-token': token
-                }
-            });
-    
-            const tableHead = [
-                {
-                    "id:": 1,
-                    "name": "Model"
-                },
-                {
-                    "id": 2,
-                    "name": "Brand"
-                },
-                {
-                    "id": 3,
-                    "name": ""
-                }
-            ]
-    
-            const brands = await axios.get(config.apiUrl + "/brands", {
-                headers: {
-                    'x-access-token': token
-                }
-            });
-
-            setAllCars(cars.data);
-            setCars(cars.data);
-            setTableHead(tableHead);
-            setBrands(brands.data);
+    const fetchData = async () => {
+        const token = window.sessionStorage.getItem('token');
+        if (!token) {
+            history.push('/login');
         }
-    }, [props]);
+
+        const carsList = await axios.get(config.apiUrl + "/cars", {
+            headers: {
+                'x-access-token': token
+            }
+        });
+
+        const tableHead = [
+            {
+                "id:": 1,
+                "name": "Model"
+            },
+            {
+                "id": 2,
+                "name": "Brand"
+            },
+            {
+                "id": 3,
+                "name": ""
+            }
+        ]
+
+        const brands = await axios.get(config.apiUrl + "/brands", {
+            headers: {
+                'x-access-token': token
+            }
+        });
+
+        setAllCars(carsList.data);
+        setCars(carsList.data);
+        setTableHead(tableHead);
+        setBrands(brands.data);
+    }
+
+    useEffect(() => {
+        fetchData()
+    }, []);
 
     const handleUpdate = async () => {
         const token = window.sessionStorage.getItem('token');
@@ -69,7 +73,7 @@ function CarsList(props) {
         });
         if (cars.data.result === "fail" && cars.data.message === "no-token") { 
             window.sessionStorage.removeItem('token');
-            props.history.push('/login');
+            history.push('/login');
         }
 
         setCars(cars.data);
@@ -129,7 +133,7 @@ function CarsList(props) {
         });
         if (result.data.result === "fail" && result.data.message === "no-token") { 
             window.sessionStorage.removeItem('token');
-            props.history.push('/login');
+            history.push('/login');
         }
     }
 
@@ -165,7 +169,7 @@ function CarsList(props) {
     
     return(
         <div>
-            <Navbar userType={props.userType}/>
+            <Navbar userType={userType}/>
             <div className="carsListContent">
                 <div className="filter">
                     <FilterList data={brands} handleFilter={handleFilter} selectedItem={selectedBrand}/>
@@ -174,10 +178,10 @@ function CarsList(props) {
                     <div className="topElements">
                         <div className="buttons">
                             {
-                                props.userType === "admin" ? (
+                                userType === "admin" ? (
                                     <Link to="carslist/new" className="btn btn-primary btnNew">Create car</Link>
                                 ) : (
-                                <React.Fragment/>
+                                    <React.Fragment/>
                                 )
                             }
                             <button className="btn btn-primary" onClick={handleUpdate}>Refresh</button>
@@ -189,7 +193,7 @@ function CarsList(props) {
                     {
                         pageCars.length !== 0 ? (
                             <div className="table">
-                                <CarsTable data={pageCars} tableHead={tableHead} api="carslist" handleDelete={handleDelete} userType={props.userType}/>
+                                <CarsTable data={pageCars} tableHead={tableHead} api="carslist" handleDelete={handleDelete} userType={userType}/>
                                 <Pagination itemsCount={totalCount} pageSize={pageSize} currentPage={currentPage} onPageChange={handlePageChange} handleNumItems={handleNumItems} numItems={pageSize}/>
                             </div>
                         ) : (
@@ -204,4 +208,11 @@ function CarsList(props) {
     )
 }
 
-export default CarsList
+const mapStateToProps = (state) => ({
+    cars: state.cars, 
+    allCars: state.allCars,
+    brands: state.brands
+});
+
+
+export default connect(mapStateToProps, mapDispatch)(CarsList);

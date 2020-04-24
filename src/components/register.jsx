@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useState} from 'react';
 import axios from 'axios';
 import config from '../config.json';
 
@@ -30,6 +30,9 @@ function Register (props) {
 
             case "password":
                 setPassword(value);
+                break;
+
+            default:
                 break;
         }
     }

@@ -149,6 +149,9 @@ function UserForm (props) {
             case "password":
                 setPassword(value);
                 break;
+
+            default:
+                break;
         }
         if (id !== "" && name !== "" && surname !== "" && email !== "" && userType !== "" && username !== "") {
             setSubmit(false);

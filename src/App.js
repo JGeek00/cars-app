@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, {useState, useEffect} from 'react';
 
 import Home from "./components/home";
 import CarsList from "./components/carsList";
@@ -15,83 +15,86 @@ import BrandsForm from './components/brandsForm';
 import { Route, Redirect, Switch } from "react-router-dom";
 import axios from 'axios';
 import config from './config.json';
-import 'react-toastify/dist/ReactToastify.css';
 
+import {Provider} from 'react-redux';
+import store from './store';
+
+import 'react-toastify/dist/ReactToastify.css';
 import './css/App.css';
 
 
-class App extends Component {
-	state = {
-		user: {}
-	}
+function App (props) {
+	const [user, setUser] = useState({});
 
-	async componentDidMount() {
-		const token = window.sessionStorage.getItem('token');
-		if (token) {
-			const user = await axios.get(config.apiUrl + '/profile', {
-				headers: {
-					'x-access-token': token
+	useEffect(() => {
+		loadData();
+		async function loadData() {
+			const token = window.sessionStorage.getItem('token');
+			if (token) {
+				const user = await axios.get(config.apiUrl + '/profile', {
+					headers: {
+						'x-access-token': token
+					}
+				});
+				if (user.data.result === "fail" && user.data.message === "no-token") {
+					window.sessionStorage.removeItem('token');
+					this.props.history.push('/login');
 				}
-			});
-			if (user.data.result === "fail" && user.data.message === "no-token") {
-				window.sessionStorage.removeItem('token');
-				this.props.history.push('/login');
+				
+				setUser(user.data);
 			}
-			this.setState({
-				user: user.data
-			});
 		}
+	})
+
+	const onLogin = (user) => {
+		setUser(user);
 	}
 
-	onLogin = (user) => {
-		this.setState({user: user});
-	}
-
-	render() {
-		return (
-			<React.Fragment>
+	return (
+		<React.Fragment>
+			<Provider store={store}>
 				<div>
 					<Switch>
 						<Route path="/brands/:id" render={
-							props => <BrandsForm {...props} userType={this.state.user.type}/>
+							props => <BrandsForm {...props} userType={user.type}/>
 						}/>
 						<Route path="/brands" render={
-							props => <BrandsList {...props} userType={this.state.user.type}/>
+							props => <BrandsList {...props} userType={user.type}/>
 						}/>
 						<Route path="/users/:id" render={
-							props => <UserForm {...props} userType={this.state.user.type}/>
+							props => <UserForm {...props} userType={user.type}/>
 						}/>
 						<Route path="/users/new" render={
-							props => <UserForm {...props} userType={this.state.user.type}/>
+							props => <UserForm {...props} userType={user.type}/>
 						}/>
 						<Route path="/users" render={
-							props => <UserList {...props} userType={this.state.user.type}/>
+							props => <UserList {...props} userType={user.type}/>
 						}/>
 						<Route path="carslist/new" render={
-							props => <CarForm {...props} userType={this.state.user.type}/>
+							props => <CarForm {...props} userType={user.type}/>
 						}/>
 						<Route path="/carslist/:id" render={
-							props => <CarForm {...props} userType={this.state.user.type}/>
+							props => <CarForm {...props} userType={user.type}/>
 						}/>
 						<Route path="/carslist" render={
-							props => <CarsList {...props} userType={this.state.user.type}/>
+							props => <CarsList {...props} userType={user.type}/>
 						}/>
 						<Route path="/profile" component={Profile}/>
 						<Route path="/login" render={
-							props => <Login {...props} onLogin={this.onLogin}/>
+							props => <Login {...props} onLogin={onLogin}/>
 						}/>
 						<Route path="/register" component={Register}/>
 						<Route path="/home" render={
-							props => <Home {...props} userType={this.state.user.type}/>
+							props => <Home {...props} userType={user.type}/>
 						}/>
 						<Route path="/not-found" component={NotFound} />
 						<Redirect from="/" exact to="/home" />
 						<Redirect to="/not-found" />
 					</Switch>
 				</div>
-			</React.Fragment>
-		);
-	}
+			</Provider>
+		</React.Fragment>
+	);
 }
 
 export default App;
