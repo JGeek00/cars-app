@@ -5,31 +5,33 @@ import config from '../config.json';
 import {Link} from 'react-router-dom';
 import Navbar from './navbar';
 
-import {connect} from 'react-redux';
+import {connect, useDispatch} from 'react-redux';
 import {setBrands} from '../store';
 
 const mapDispatch = {setBrands};
 
 function BrandsList ({history, userType, brands, setBrands}) {
-    console.log("cosa")
+    const dispatch = useDispatch(); 
 
-    async function loadData() {
-        const token = window.sessionStorage.getItem('token');
-        if (!token) {
-            history.push('/login');
-        }
-
-        const brands = await axios.get(config.apiUrl + '/brands', {
-            headers: {
-                'x-access-token': token
+    const loadData = () => {
+        return dispatch => {
+            const token = window.sessionStorage.getItem('token');
+            if (!token) {
+                history.push('/login');
             }
-        });
-        setBrands(brands.data);
+    
+            axios.get(config.apiUrl + '/brands', {
+                headers: {
+                    'x-access-token': token
+                }
+            }).then(brands => {
+                dispatch(setBrands(brands.data));
+            });
+        }
     }
 
     useEffect(() => {
-        console.log("cosa2")
-        loadData();
+        dispatch(loadData()); 
     }, []);
 
     return (

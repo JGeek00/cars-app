@@ -6,32 +6,39 @@ import config from '../config.json';
 import Navbar from './navbar';
 import {ToastContainer, toast} from 'react-toastify';
 
-function UserList (props) {
-    const [users, setUsers] = useState([]);
+import {connect, useDispatch} from 'react-redux';
+import {setUsers} from '../store';
+
+const mapDispatch = {setUsers};
+
+function UserList ({history, userType, users, setUsers}) {
+    const dispatch = useDispatch(); 
+
     const [tableHead, setTableHead] = useState([]);
 
-    useEffect(() => {
-        loadData();
-        async function loadData () {
+    const loadData = () => {
+        return dispatch => {
             const token = window.sessionStorage.getItem('token');
             if (!token) {
-                props.history.push('/login');
+                history.push('/login');
             }
-    
-            if (props.userType !== "admin") {
-                props.history.push('/home');
+
+            if (userType !== "admin") {
+                history.push('/home');
             }
         
-            const users = await axios.get(config.apiUrl + "/users", {
+            axios.get(config.apiUrl + "/users", {
                 headers: {
                     'x-access-token': token
                 }
+            }).then((users) => {
+                if (users.data.result === "fail" && users.data.message === "no-token") {
+                    window.sessionStorage.removeItem('token');
+                    history.push('/login');
+                }
+                dispatch(setUsers(users.data));
             });
-            if (users.data.result === "fail" && users.data.message === "no-token") {
-                window.sessionStorage.removeItem('token');
-                props.history.push('/login');
-            }
-    
+            
             const tableHead = [
                 {
                     "id:": 1,
@@ -55,10 +62,13 @@ function UserList (props) {
                 }
             ]
 
-            setUsers(users.data);
             setTableHead(tableHead);
         }
-    }, [props]);
+    }
+
+    useEffect(() => {
+        dispatch(loadData());
+    }, []);
 
     const handleUpdate = async () => {
         const token = window.sessionStorage.getItem('token');
@@ -69,7 +79,7 @@ function UserList (props) {
         });
         if (users.data.result === "fail" && users.data.message === "no-token") {
             window.sessionStorage.removeItem('token');
-            props.history.push('/login');
+            history.push('/login');
         }
 
         setUsers(users.data);
@@ -105,7 +115,7 @@ function UserList (props) {
         });
         if (result.data.result === "fail" && result.data.message === "no-token") {
             window.sessionStorage.removeItem('token');
-            props.history.push('/login');
+            history.push('/login');
         }
         else if (result.data.result === "fail" && result.data.message === "same-user") {
             toast.error("You can't delete your own user");
@@ -120,7 +130,7 @@ function UserList (props) {
 
     return (
         <div>
-            <Navbar userType={props.userType}/>
+            <Navbar userType={userType}/>
             <ToastContainer position="top-right"/>
             <div className="usersListContent">
                 <div className="table">
@@ -134,5 +144,9 @@ function UserList (props) {
         </div>
     );
 }
+
+const mapStateToProps = (state) => ({
+    users: state.users
+});
  
-export default UserList;
+export default connect(mapStateToProps, mapDispatch)(UserList);

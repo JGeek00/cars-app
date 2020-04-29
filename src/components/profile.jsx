@@ -13,33 +13,34 @@ function Profile (props) {
     const [submit, setSubmit] = useState(true);
     const [pageTitle] = useState('Profile');
 
+    async function loadData() {
+        const token = window.sessionStorage.getItem('token');
+        if (!token) {
+            props.history.push('/login');
+        }
+
+        const user = await axios.get(config.apiUrl + '/profile', {
+            headers: {
+                'x-access-token': token
+            }
+        });
+
+        if (user.data.result === "fail" && user.data.message === "no-token") {
+            window.sessionStorage.removeItem('token');
+            props.history.push('/login');
+        }
+
+        setId(user.data._id);
+        setName(user.data.name);
+        setSurname(user.data.surname);
+        setEmail(user.data.email);
+        setUsername(user.data.username);
+        setSubmit(false);
+    }
+
     useEffect(() => {
         loadData();
-        async function loadData() {
-            const token = window.sessionStorage.getItem('token');
-            if (!token) {
-                props.history.push('/login');
-            }
-    
-            const user = await axios.get(config.apiUrl + '/profile', {
-                headers: {
-                    'x-access-token': token
-                }
-            });
-    
-            if (user.data.result === "fail" && user.data.message === "no-token") {
-                window.sessionStorage.removeItem('token');
-                props.history.push('/login');
-            }
-
-            setId(user.data._id);
-            setName(user.data.name);
-            setSurname(user.data.surname);
-            setEmail(user.data.email);
-            setUsername(user.data.username);
-            setSubmit(false);
-        }
-    }, [props]);
+    }, []);
 
     const handleChange = (e) => {
         const {name, value} = e.target;

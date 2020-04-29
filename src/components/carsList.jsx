@@ -8,60 +8,67 @@ import Pagination from './common/pagination';
 import config from "../config.json";
 import Navbar from './navbar';
 
-import {connect} from 'react-redux';
+import {connect, useDispatch} from 'react-redux';
 import {setCars, setAllCars, setBrands} from '../store';
+import {loadCars} from '../actions/loadCars';
 
-const mapDispatch = {setCars, setAllCars, setBrands};
+const mapDispatch = {setCars, setAllCars, setBrands, loadCars};
 
-const CarsList = ({userType, history, cars, allCars, brands, setCars, setAllCars, setBrands}) => {
-    console.log("cars1",cars)
+const CarsList = ({userType, history, loadCars, cars, allCars, brands, setCars, setAllCars, setBrands}) => {
+    const dispatch = useDispatch(); 
+    
     const [tableHead, setTableHead] = useState([]);
     const [selectedBrand, setSelectedBrand] = useState('');
     const [searchQuery, setSearchQuery] = useState('');
     const [currentPage, setCurrentPage] = useState(1);
     const [pageSize, setPageSize] = useState(8);
 
-    const fetchData = async () => {
-        const token = window.sessionStorage.getItem('token');
-        if (!token) {
-            history.push('/login');
+    const fetchData = () => {
+        return dispatch => {
+            const token = window.sessionStorage.getItem('token');
+            if (!token) {
+                history.push('/login');
+            }
+    
+            axios.get(config.apiUrl + "/cars", {
+                headers: {
+                    'x-access-token': token
+                }
+            }).then((carsList) => {
+                dispatch(setAllCars(carsList.data));
+                dispatch(setCars(carsList.data));
+
+                axios.get(config.apiUrl + "/brands", {
+                    headers: {
+                        'x-access-token': token
+                    }
+                }).then((brands) => {
+                    dispatch(setBrands(brands.data));
+                })
+            })
+    
+            const tableHead = [
+                {
+                    "id:": 1,
+                    "name": "Model"
+                },
+                {
+                    "id": 2,
+                    "name": "Brand"
+                },
+                {
+                    "id": 3,
+                    "name": ""
+                }
+            ]
+
+            setTableHead(tableHead);
+            
         }
-
-        const carsList = await axios.get(config.apiUrl + "/cars", {
-            headers: {
-                'x-access-token': token
-            }
-        });
-
-        const tableHead = [
-            {
-                "id:": 1,
-                "name": "Model"
-            },
-            {
-                "id": 2,
-                "name": "Brand"
-            },
-            {
-                "id": 3,
-                "name": ""
-            }
-        ]
-
-        const brands = await axios.get(config.apiUrl + "/brands", {
-            headers: {
-                'x-access-token': token
-            }
-        });
-
-        setAllCars(carsList.data);
-        setCars(carsList.data);
-        setTableHead(tableHead);
-        setBrands(brands.data);
     }
 
     useEffect(() => {
-        fetchData()
+        dispatch(fetchData());
     }, []);
 
     const handleUpdate = async () => {
@@ -172,7 +179,7 @@ const CarsList = ({userType, history, cars, allCars, brands, setCars, setAllCars
             <Navbar userType={userType}/>
             <div className="carsListContent">
                 <div className="filter">
-                    <FilterList data={brands} handleFilter={handleFilter} selectedItem={selectedBrand}/>
+                    <FilterList data={brands} handleFilter={handleFilter} selectedItem={selectedBrand} />
                 </div>
                 <div className="listContent">
                     <div className="topElements">
@@ -193,7 +200,7 @@ const CarsList = ({userType, history, cars, allCars, brands, setCars, setAllCars
                     {
                         pageCars.length !== 0 ? (
                             <div className="table">
-                                <CarsTable data={pageCars} tableHead={tableHead} api="carslist" handleDelete={handleDelete} userType={userType}/>
+                                <CarsTable data={pageCars} tableHead={tableHead}  api="carslist" handleDelete={handleDelete} userType={userType}/>
                                 <Pagination itemsCount={totalCount} pageSize={pageSize} currentPage={currentPage} onPageChange={handlePageChange} handleNumItems={handleNumItems} numItems={pageSize}/>
                             </div>
                         ) : (

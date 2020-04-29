@@ -3,50 +3,43 @@ import axios from "axios";
 import { toast, ToastContainer } from 'react-toastify';
 import config from '../config.json';
 
-function CarForm (props) {
+import {connect, useDispatch} from 'react-redux';
+
+function CarForm ({history, brands, userType, match}) {
+    const dispatch = useDispatch(); 
+
     const [id, setId] = useState('');
     const [model, setModel] = useState('');
     const [brand, setBrand] = useState('');
-    const [brands, setBrands] = useState([]);
-    const [firstLoad, setFirstLoad] = useState(true);
 
-    useEffect(() => {
-        if (firstLoad === true) {
-            loadData();
-            setFirstLoad(false);
-        }
-        
-        async function loadData() {
+    const loadData = () => {
+        return dispatch => {
             const token = window.sessionStorage.getItem('token');
             if (!token) {
-                props.history.push('/login');
+                history.push('/login');
             }
     
-            const id = props.match.params.id;
-            const brands = await axios.get(config.apiUrl + '/brands', {
-                headers: {
-                    'x-access-token': token
-                }
-            });
-            
-            setBrands(brands.data);
-
+            const id = match.params.id;
             if (id !== "new") {
-                const car = await axios.get(config.apiUrl + '/cars/'+id, {
+                axios.get(config.apiUrl + '/cars/'+id, {
                     headers: {
                         'x-access-token': token
                     }
-                });
-
-                setId(id);
-                setModel(car.data.model);
-                setBrand(car.data.brand);
+                }).then(car => {
+                    setId(id);
+                    setModel(car.data.model);
+                    setBrand(car.data.brand);
+                })           
             }
             else {
                 setId(id);
             }
         }
-    }, [props, firstLoad]);
+    }
+
+    useEffect(() => {  
+        dispatch(loadData())
+    }, []);
 
     const handleUpdate = async () => {
         const token = window.sessionStorage.getItem('token');
@@ -63,11 +56,11 @@ function CarForm (props) {
                 }
             });
             if (result.data.result === "success") {
-                props.history.push('/carslist');
+                history.push('/carslist');
             }
             else if (result.data.result === "fail" && result.data.message === "no-token") { 
                 window.sessionStorage.removeItem('token');
-                props.history.push('/login');
+                history.push('/login');
             }
             else if (result.data.result === "fail" && result.data.message !== "no-token") {
                 toast.error("An error occurred while creating the car");
@@ -80,11 +73,11 @@ function CarForm (props) {
                 }
             });
             if (result.data.result === "success") {
-                props.history.push('/carslist');
+                history.push('/carslist');
             }
             else if (result.data.result === "fail" && result.data.message === "no-token") { 
                 window.sessionStorage.removeItem('token');
-                props.history.push('/login');
+                history.push('/login');
             }
             else if (result.data.result === "fail" && result.data.message !== "no-token") {
                 toast.error("An error occurred while updating the car");
@@ -106,10 +99,10 @@ function CarForm (props) {
         <div className="addFormContent">
             <ToastContainer position="top-right"/>
             {
-                props.userType === "user" ? (
+                userType === "user" ? (
                     <h3>Car info</h3>
                 ) : (
-                    props.match.params.id === "new" ? (
+                    match.params.id === "new" ? (
                         <h3>Add a new car</h3>
                     ) : (
                         <h3>Edit this car</h3>
@@ -119,10 +112,10 @@ function CarForm (props) {
             <form>
                 <div className="form-group">
                     <label htmlFor="model">Model</label>
-                    <input type="text" className="form-control" name="model" id="model" value={model} onChange={handleChange} disabled={props.userType === "admin" ? '' : 'disabled'}/>
+                    <input type="text" className="form-control" name="model" id="model" value={model} onChange={handleChange} disabled={userType === "admin" ? '' : 'disabled'}/>
                 </div>
                 <div className="form-group">
-                    <select className="custom-select" name="brand" value={brand} onChange={handleChange} disabled={props.userType === "admin" ? '' : 'disabled'}>
+                    <select className="custom-select" name="brand" value={brand} onChange={handleChange} disabled={userType === "admin" ? '' : 'disabled'}>
                         <option value={brand === "" ? "selected" : ""}>Select a brand</option>
                         {
                             brands.map(oneBrand => (
@@ -132,7 +125,7 @@ function CarForm (props) {
                     </select>
                 </div>
                 {
-                    props.userType === "admin" ? (
+                    userType === "admin" ? (
                         <button type="button" className="btn btn-primary" onClick={handleUpdate}>Save</button>
                     ) : (
                         <React.Fragment/>
@@ -143,4 +136,9 @@ function CarForm (props) {
     )
 }
 
-export default CarForm
+const mapStateToProps = (state) => ({
+    brands: state.brands
+});
+
+
+export default connect(mapStateToProps, null)(CarForm);

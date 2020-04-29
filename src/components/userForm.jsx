@@ -15,46 +15,47 @@ function UserForm (props) {
     const [pageTitle, setPageTitle] = useState('');
     const [submit, setSubmit] = useState(true);
 
-    useEffect(() => {
-        loadData();
-        async function loadData() {
+    async function loadData() {
+        const token = window.sessionStorage.getItem('token');
+        if (!token) {
+            props.history.push('/login');
+        }
+
+        if (props.userType !== "admin") {
+            props.history.push('/home');
+        }
+
+        const id = props.match.params.id;
+        if (id !== "new") {
             const token = window.sessionStorage.getItem('token');
-            if (!token) {
+            const user = await axios.get(config.apiUrl + "/users/"+id, {
+                headers: {
+                    'x-access-token': token
+                }
+            });
+            if (user.data.result === "fail" && user.data.message === "no-token") {
+                window.sessionStorage.removeItem('token');
                 props.history.push('/login');
             }
-    
-            if (props.userType !== "admin") {
-                props.history.push('/home');
-            }
-    
-            const id = props.match.params.id;
-            if (id !== "new") {
-                const token = window.sessionStorage.getItem('token');
-                const user = await axios.get(config.apiUrl + "/users/"+id, {
-                    headers: {
-                        'x-access-token': token
-                    }
-                });
-                if (user.data.result === "fail" && user.data.message === "no-token") {
-                    window.sessionStorage.removeItem('token');
-                    props.history.push('/login');
-                }
 
-                setId(id);
-                setName(user.data.name);
-                setSurname(user.data.surname);
-                setEmail(user.data.email);
-                setUserType(user.data.type);
-                setUsername(user.data.username);
-                setPageTitle("Edit an user");
-                setSubmit(false);
-            }
-            else {
-                setId(id);
-                setPageTitle("Create a new user")
-            }
+            setId(id);
+            setName(user.data.name);
+            setSurname(user.data.surname);
+            setEmail(user.data.email);
+            setUserType(user.data.type);
+            setUsername(user.data.username);
+            setPageTitle("Edit an user");
+            setSubmit(false);
         }
-    })
+        else {
+            setId(id);
+            setPageTitle("Create a new user")
+        }
+    }
+
+    useEffect(() => {
+        loadData();
+    }, [])
 
     const handleUpdate = async () => {
         if (id !== "" && name !== "" && surname !== "" && email !== "" && userType !== "" && username !== "") {

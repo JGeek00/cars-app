@@ -1,4 +1,6 @@
-import {configureStore, createSlice} from '@reduxjs/toolkit';
+import {createSlice} from '@reduxjs/toolkit';
+import {createStore, applyMiddleware,compose} from 'redux';
+import thunkMiddleware from 'redux-thunk'
 
 
 const carsSlice = createSlice({
@@ -6,9 +8,19 @@ const carsSlice = createSlice({
     initialState: {
         cars: [],
         allCars: [],
-        brands: []
+        brands: [],
+        user: {},
+        users: []
     },
     reducers: {
+        setUser: {
+            reducer(state, action) {
+                return {
+                    ...state,
+                    user: action.payload
+                }
+            }
+        },
         setCars: {
             reducer(state, action) {
                 return {
@@ -21,7 +33,7 @@ const carsSlice = createSlice({
             reducer(state, action) {
                 return {
                     ...state,
-                    cars: action.payload
+                    allCars: action.payload
                 }
             }
         },
@@ -32,12 +44,24 @@ const carsSlice = createSlice({
                     brands: action.payload
                 }
             }
+        },
+        setUsers: {
+            reducer(state, action) {
+                return {
+                    ...state,
+                    users: action.payload
+                }
+            }
         }
     }
 })
 
-export const {setCars, setAllCars, setBrands} = carsSlice.actions;
+export const {setUser, setCars, setAllCars, setBrands, setUsers} = carsSlice.actions;
 
-export default configureStore({
-    reducer: carsSlice.reducer
-});
+const middlewareEnhancer = applyMiddleware(thunkMiddleware);
+
+const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
+
+export default createStore(carsSlice.reducer, undefined, composeEnhancers(
+    middlewareEnhancer
+)); 

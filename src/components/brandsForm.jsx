@@ -5,31 +5,27 @@ import config from '../config.json';
 
 function BradsForm (props) {
     const [name, setName] = useState('');
-    const [firstTime, setFirstTime] = useState(true);
+
+    async function loadData() {
+        const token = window.sessionStorage.getItem('token');
+        if (!token) {
+            props.history.push('/login');
+        }
+
+        const id = props.match.params.id;
+        if (id !== "new") {
+        const {data} = await axios.get(config.apiUrl + '/brands/' + id, {
+            headers: {
+                'x-access-token': token
+            }
+            });
+            setName(data.name);
+        }
+    }
 
     useEffect(() => {
-        if (firstTime === true) {
-            loadData()
-            setFirstTime(false);
-        }
-
-        async function loadData() {
-            const token = window.sessionStorage.getItem('token');
-            if (!token) {
-                props.history.push('/login');
-            }
-    
-            const id = props.match.params.id;
-            if (id !== "new") {
-                const {data} = await axios.get(config.apiUrl + '/brands/' + id, {
-                    headers: {
-                        'x-access-token': token
-                    }
-                });
-                setName(data.name);
-            }
-        }
-    }, [props, firstTime]);
+        loadData();
+    }, []);
 
     const handleChange = (e) => {
         const {value} = e.target;
