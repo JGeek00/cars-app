@@ -8,16 +8,17 @@ import {ToastContainer, toast} from 'react-toastify';
 
 import {connect, useDispatch} from 'react-redux';
 import {setUsers} from '../store';
+import {loadUsers} from '../actions/loadUsers';
 
-const mapDispatch = {setUsers};
+const mapDispatch = {setUsers, loadUsers};
 
-function UserList ({history, userType, users, setUsers}) {
+function UserList ({history, userType, users, loadUsers, setUsers}) {
     const dispatch = useDispatch(); 
 
     const [tableHead, setTableHead] = useState([]);
 
     const loadData = () => {
-        return dispatch => {
+        return () => {
             const token = window.sessionStorage.getItem('token');
             if (!token) {
                 history.push('/login');
@@ -27,17 +28,7 @@ function UserList ({history, userType, users, setUsers}) {
                 history.push('/home');
             }
         
-            axios.get(config.apiUrl + "/users", {
-                headers: {
-                    'x-access-token': token
-                }
-            }).then((users) => {
-                if (users.data.result === "fail" && users.data.message === "no-token") {
-                    window.sessionStorage.removeItem('token');
-                    history.push('/login');
-                }
-                dispatch(setUsers(users.data));
-            });
+            loadUsers(token, history);
             
             const tableHead = [
                 {

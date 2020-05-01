@@ -1,32 +1,24 @@
 import React, {useEffect} from 'react';
 import BrandsTable from './brandsTable';
-import axios from 'axios';
-import config from '../config.json';
 import {Link} from 'react-router-dom';
 import Navbar from './navbar';
 
 import {connect, useDispatch} from 'react-redux';
-import {setBrands} from '../store';
+import {loadBrands} from '../actions/loadBrands';
 
-const mapDispatch = {setBrands};
+const mapDispatch = {loadBrands};
 
-function BrandsList ({history, userType, brands, setBrands}) {
+function BrandsList ({history, userType, brands, loadBrands}) {
     const dispatch = useDispatch(); 
 
     const loadData = () => {
-        return dispatch => {
+        return () => {
             const token = window.sessionStorage.getItem('token');
             if (!token) {
                 history.push('/login');
             }
     
-            axios.get(config.apiUrl + '/brands', {
-                headers: {
-                    'x-access-token': token
-                }
-            }).then(brands => {
-                dispatch(setBrands(brands.data));
-            });
+            loadBrands(token);
         }
     }
 

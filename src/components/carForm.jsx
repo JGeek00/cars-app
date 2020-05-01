@@ -13,7 +13,7 @@ function CarForm ({history, brands, userType, match}) {
     const [brand, setBrand] = useState('');
 
     const loadData = () => {
-        return dispatch => {
+        return () => {
             const token = window.sessionStorage.getItem('token');
             if (!token) {
                 history.push('/login');

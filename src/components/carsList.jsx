@@ -9,12 +9,12 @@ import config from "../config.json";
 import Navbar from './navbar';
 
 import {connect, useDispatch} from 'react-redux';
-import {setCars, setAllCars, setBrands} from '../store';
+import {setCars, setAllCars} from '../store';
 import {loadCars} from '../actions/loadCars';
 
-const mapDispatch = {setCars, setAllCars, setBrands, loadCars};
+const mapDispatch = {setCars, setAllCars, loadCars};
 
-const CarsList = ({userType, history, loadCars, cars, allCars, brands, setCars, setAllCars, setBrands}) => {
+const CarsList = ({userType, history, loadCars, cars, allCars, brands, setCars, setAllCars}) => {
     const dispatch = useDispatch(); 
     
     const [tableHead, setTableHead] = useState([]);
@@ -24,28 +24,13 @@ const CarsList = ({userType, history, loadCars, cars, allCars, brands, setCars, 
     const [pageSize, setPageSize] = useState(8);
 
     const fetchData = () => {
-        return dispatch => {
+        return () => {
             const token = window.sessionStorage.getItem('token');
             if (!token) {
                 history.push('/login');
             }
-    
-            axios.get(config.apiUrl + "/cars", {
-                headers: {
-                    'x-access-token': token
-                }
-            }).then((carsList) => {
-                dispatch(setAllCars(carsList.data));
-                dispatch(setCars(carsList.data));
 
-                axios.get(config.apiUrl + "/brands", {
-                    headers: {
-                        'x-access-token': token
-                    }
-                }).then((brands) => {
-                    dispatch(setBrands(brands.data));
-                })
-            })
+            loadCars(token);
     
             const tableHead = [
                 {
@@ -63,7 +48,6 @@ const CarsList = ({userType, history, loadCars, cars, allCars, brands, setCars, 
             ]
 
             setTableHead(tableHead);
-            
         }
     }
 
