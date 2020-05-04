@@ -10,7 +10,8 @@ const carsSlice = createSlice({
         allCars: [],
         brands: [],
         user: {},
-        users: []
+        users: [],
+        redirectToLogin: false
     },
     reducers: {
         setUser: {
@@ -52,11 +53,19 @@ const carsSlice = createSlice({
                     users: action.payload
                 }
             }
+        },
+        setRedirectToLogin: {
+            reducer(state, action) {
+                return {
+                    ...state,
+                    setRedirectToLogin: action.payload
+                }
+            }
         }
     }
 })
 
-export const {setUser, setCars, setAllCars, setBrands, setUsers} = carsSlice.actions;
+export const {setUser, setCars, setAllCars, setBrands, setUsers, setRedirectToLogin} = carsSlice.actions;
 
 const middlewareEnhancer = applyMiddleware(thunkMiddleware);
 

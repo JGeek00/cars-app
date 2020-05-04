@@ -7,6 +7,7 @@ import {ToastContainer, toast} from 'react-toastify';
 function Login (props) {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
+    const [submitStatus, setSubmitStatus] = useState(true);
 
     const handleChange = (e) => {
         const {name, value} = e.target;
@@ -16,20 +17,36 @@ function Login (props) {
         else if (name === "password") {
             setPassword(value);
         }
+
+        if (username !== '' && password !== '') {
+            setSubmitStatus(false);
+        }
+        else {
+            setSubmitStatus(true);
+        }
     }
 
     const handleLogin = async () => {
-        const response = await axios.post(config.apiUrl + '/login', {
-            username: username,
-            password: password
-        });
-        if (response.data.result === "success") {
-            window.sessionStorage.setItem('token', response.data.token);
-            props.onLogin(response.data.userData);
-            props.history.push('/home');
+        if (username !== '' && password !== '') {
+            try {
+                const response = await axios.post(config.apiUrl + '/login', {
+                    username: username,
+                    password: password
+                });
+                if (response.data.result === "success") {
+                    window.sessionStorage.setItem('token', response.data.token);
+                    props.onLogin(response.data.userData);
+                    props.history.push('/home');
+                }
+                else if (response.data.result === "fail" && response.data.message === "password-not-match") {
+                    toast.error("Invalid password");
+                }
+            } catch (error) {
+                toast.error("Invalid username or password");
+            }
         }
-        else if (response.data.result === "fail" && response.data.message === "password-not-match") {
-            toast.error("Invalid password");
+        else {
+            toast.warn("Username and password can't be empty");
         }
     }
 
@@ -46,7 +63,7 @@ function Login (props) {
                     <label htmlFor="passwordInput">Password</label>
                     <input type="password" className="form-control" name="password" id="passwordInput" onChange={handleChange}/>
                 </div>
-                <button className="btn btn-primary" onClick={handleLogin}>Login</button>
+                <button className="btn btn-primary" onClick={handleLogin} disabled={submitStatus}>Login</button>
                 <Link to="/register" className="register-button btn btn-primary">Register</Link>
             </div>
         </div>

@@ -9,12 +9,12 @@ import config from "../config.json";
 import Navbar from './navbar';
 
 import {connect, useDispatch} from 'react-redux';
-import {setCars, setAllCars} from '../store';
+import {setCars, setAllCars, setRedirectToLogin} from '../store';
 import {loadCars} from '../actions/loadCars';
 
-const mapDispatch = {setCars, setAllCars, loadCars};
+const mapDispatch = {setCars, setAllCars, loadCars, setRedirectToLogin};
 
-const CarsList = ({userType, history, loadCars, cars, allCars, brands, setCars, setAllCars}) => {
+const CarsList = ({userType, history, loadCars, cars, allCars, brands, setCars, setAllCars, setRedirectToLogin}) => {
     const dispatch = useDispatch(); 
     
     const [tableHead, setTableHead] = useState([]);
@@ -23,14 +23,15 @@ const CarsList = ({userType, history, loadCars, cars, allCars, brands, setCars, 
     const [currentPage, setCurrentPage] = useState(1);
     const [pageSize, setPageSize] = useState(8);
 
+    const token = window.sessionStorage.getItem('token');
+    if (setRedirectToLogin === true || !token) {
+        dispatch(setRedirectToLogin(false));
+        history.push('/login');
+    }
+
     const fetchData = () => {
         return () => {
-            const token = window.sessionStorage.getItem('token');
-            if (!token) {
-                history.push('/login');
-            }
-
-            loadCars(token);
+            loadCars();
     
             const tableHead = [
                 {
@@ -202,7 +203,8 @@ const CarsList = ({userType, history, loadCars, cars, allCars, brands, setCars, 
 const mapStateToProps = (state) => ({
     cars: state.cars, 
     allCars: state.allCars,
-    brands: state.brands
+    brands: state.brands,
+    setRedirectToLogin: state.setRedirectToLogin
 });
 
 

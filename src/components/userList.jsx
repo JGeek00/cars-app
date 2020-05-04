@@ -7,28 +7,29 @@ import Navbar from './navbar';
 import {ToastContainer, toast} from 'react-toastify';
 
 import {connect, useDispatch} from 'react-redux';
-import {setUsers} from '../store';
+import {setUsers, setRedirectToLogin} from '../store';
 import {loadUsers} from '../actions/loadUsers';
 
-const mapDispatch = {setUsers, loadUsers};
+const mapDispatch = {setUsers, loadUsers, setRedirectToLogin};
 
-function UserList ({history, userType, users, loadUsers, setUsers}) {
+function UserList ({history, userType, users, loadUsers, setUsers, redirectToLogin, setRedirectToLogin}) {
     const dispatch = useDispatch(); 
 
     const [tableHead, setTableHead] = useState([]);
 
+    const token = window.sessionStorage.getItem('token');
+    if (redirectToLogin === true || !token) {
+        dispatch(setRedirectToLogin(false));
+        history.push('/login');
+    }
+
     const loadData = () => {
         return () => {
-            const token = window.sessionStorage.getItem('token');
-            if (!token) {
-                history.push('/login');
-            }
-
             if (userType !== "admin") {
                 history.push('/home');
             }
         
-            loadUsers(token, history);
+            loadUsers();
             
             const tableHead = [
                 {
@@ -137,7 +138,8 @@ function UserList ({history, userType, users, loadUsers, setUsers}) {
 }
 
 const mapStateToProps = (state) => ({
-    users: state.users
+    users: state.users,
+    redirectToLogin: state.redirectToLogin
 });
  
 export default connect(mapStateToProps, mapDispatch)(UserList);

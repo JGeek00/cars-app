@@ -13,36 +13,26 @@ import BrandsList from './components/brandsList';
 import BrandsForm from './components/brandsForm';
 
 import { Route, Redirect, Switch } from "react-router-dom";
-import axios from 'axios';
-import config from './config.json';
+import {loadUser} from './actions/loadUser';
 
 import 'react-toastify/dist/ReactToastify.css';
 import './css/App.css';
 
 import {connect, useDispatch} from 'react-redux';
 import {setUser} from './store';
-const mapDispatch = {setUser};
+const mapDispatch = {setUser, loadUser};
 
-function App ({history, user, setUser}) {
+function App ({history, user, setUser, loadUser, redirectToLogin}) {
 	const dispatch = useDispatch(); 
 
+	if (redirectToLogin === true) {
+		redirectToLogin(false);
+		history.push('/login');
+	}
+
 	const loadData = () => {
-		return dispatch => {
-			const token = window.sessionStorage.getItem('token');
-			if (token) {
-				axios.get(config.apiUrl + '/profile', {
-					headers: {
-						'x-access-token': token
-					}
-				}).then((user) =>  {
-					if (user.data.result === "fail" && user.data.message === "no-token") {
-						window.sessionStorage.removeItem('token');
-						history.push('/login');
-					}
-					
-					dispatch(setUser(user.data));
-				})
-			}
+		return () => {
+			loadUser();
 		}
 	}
 
@@ -56,7 +46,6 @@ function App ({history, user, setUser}) {
 
 	return (
 		<React.Fragment>
-			
 			<div>
 				<Switch>
 					<Route path="/brands/:id" render={
@@ -101,7 +90,8 @@ function App ({history, user, setUser}) {
 }
 
 const mapStateToProps = (state) => ({
-	user: state.user
+	user: state.user,
+	redirectToLogin: state.redirectToLogin
 });
 
 export default connect(mapStateToProps, mapDispatch)(App);

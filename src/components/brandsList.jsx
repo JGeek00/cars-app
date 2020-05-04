@@ -1,24 +1,27 @@
 import React, {useEffect} from 'react';
 import BrandsTable from './brandsTable';
-import {Link} from 'react-router-dom';
+import {Link, useHistory} from 'react-router-dom';
 import Navbar from './navbar';
 
 import {connect, useDispatch} from 'react-redux';
 import {loadBrands} from '../actions/loadBrands';
+import {setRedirectToLogin} from '../store';
 
-const mapDispatch = {loadBrands};
+const mapDispatch = {loadBrands, setRedirectToLogin};
 
-function BrandsList ({history, userType, brands, loadBrands}) {
+function BrandsList ({userType, brands, loadBrands, redirectToLogin, setRedirectToLogin}) {
     const dispatch = useDispatch(); 
+    const history = useHistory();
+
+    const token = window.sessionStorage.getItem('token');
+    if (redirectToLogin === true || !token) {
+        dispatch(setRedirectToLogin(false));
+        history.push('/login');
+    }
 
     const loadData = () => {
         return () => {
-            const token = window.sessionStorage.getItem('token');
-            if (!token) {
-                history.push('/login');
-            }
-    
-            loadBrands(token);
+            loadBrands();
         }
     }
 
@@ -28,7 +31,6 @@ function BrandsList ({history, userType, brands, loadBrands}) {
 
     return (
         <div>
-            {console.log("render")}
             <Navbar userType={userType}/>
             <div className="contentBrandsList">
                 <div className="contentTop">
@@ -49,7 +51,8 @@ function BrandsList ({history, userType, brands, loadBrands}) {
 }
 
 const mapStateToProps = (state) => ({
-    brands: state.brands
+    brands: state.brands,
+    redirectToLogin: state.redirectToLogin
 });
 
  
