@@ -1,12 +1,13 @@
 import React, {useEffect, useState} from 'react';
 import CarsTable from "./carsTable";
-import {Link} from "react-router-dom";
+import {Link, Redirect} from "react-router-dom";
 import axios from "axios";
 import FilterList from "./filterList";
 import {paginate} from "../utils/pagination";
 import Pagination from './common/pagination';
 import config from "../config.json";
 import Navbar from './navbar';
+import Loading from './common/loading';
 
 import {connect, useDispatch} from 'react-redux';
 import {setCars, setAllCars, setRedirectToLogin} from '../store';
@@ -14,7 +15,7 @@ import {loadCars} from '../actions/loadCars';
 
 const mapDispatch = {setCars, setAllCars, loadCars, setRedirectToLogin};
 
-const CarsList = ({userType, history, loadCars, cars, allCars, brands, setCars, setAllCars, setRedirectToLogin}) => {
+const CarsList = ({userType, history, loadCars, cars, allCars, brands, setCars, setAllCars, redirectToLogin, setRedirectToLogin}) => {
     const dispatch = useDispatch(); 
     
     const [tableHead, setTableHead] = useState([]);
@@ -22,11 +23,11 @@ const CarsList = ({userType, history, loadCars, cars, allCars, brands, setCars, 
     const [searchQuery, setSearchQuery] = useState('');
     const [currentPage, setCurrentPage] = useState(1);
     const [pageSize, setPageSize] = useState(8);
+    const [loading, setLoading] = useState(true);
 
     const token = window.sessionStorage.getItem('token');
-    if (setRedirectToLogin === true || !token) {
-        dispatch(setRedirectToLogin(false));
-        history.push('/login');
+    if (!token) {
+        dispatch(setRedirectToLogin(true));
     }
 
     const fetchData = () => {
@@ -49,6 +50,7 @@ const CarsList = ({userType, history, loadCars, cars, allCars, brands, setCars, 
             ]
 
             setTableHead(tableHead);
+            setLoading(false);
         }
     }
 
@@ -161,41 +163,58 @@ const CarsList = ({userType, history, loadCars, cars, allCars, brands, setCars, 
     
     return(
         <div>
-            <Navbar userType={userType}/>
-            <div className="carsListContent">
-                <div className="filter">
-                    <FilterList data={brands} handleFilter={handleFilter} selectedItem={selectedBrand} />
-                </div>
-                <div className="listContent">
-                    <div className="topElements">
-                        <div className="buttons">
-                            {
-                                userType === "admin" ? (
-                                    <Link to="carslist/new" className="btn btn-primary btnNew">Create car</Link>
-                                ) : (
-                                    <React.Fragment/>
-                                )
-                            }
-                            <button className="btn btn-primary" onClick={handleUpdate}>Refresh</button>
-                        </div>
-                        <div className="searchBox">
-                            <input type="text" className="form-control" id="searchBox" placeholder="Search" value={searchQuery} onChange={handleSearch}/>
-                        </div>
+            {console.log(redirectToLogin)}
+            {
+                redirectToLogin === false ? (
+                    <div>
+                        <Navbar userType={userType}/>
+                        {
+                            loading === false ? (
+                                <div className="carsListContent">
+                                    <div className="filter">
+                                        <FilterList data={brands} handleFilter={handleFilter} selectedItem={selectedBrand} />
+                                    </div>
+                                    <div className="listContent">
+                                        <div className="topElements">
+                                            <div className="buttons">
+                                                {
+                                                    userType === "admin" ? (
+                                                        <Link to="carslist/new" className="btn btn-primary btnNew">Create car</Link>
+                                                    ) : (
+                                                        <React.Fragment/>
+                                                    )
+                                                }
+                                                <button className="btn btn-primary" onClick={handleUpdate}>Refresh</button>
+                                            </div>
+                                            <div className="searchBox">
+                                                <input type="text" className="form-control" id="searchBox" placeholder="Search" value={searchQuery} onChange={handleSearch}/>
+                                            </div>
+                                        </div>
+                                        {
+                                            pageCars.length !== 0 ? (
+                                                <div className="table">
+                                                    <CarsTable data={pageCars} tableHead={tableHead}  api="carslist" handleDelete={handleDelete} userType={userType}/>
+                                                    <Pagination itemsCount={totalCount} pageSize={pageSize} currentPage={currentPage} onPageChange={handlePageChange} handleNumItems={handleNumItems} numItems={pageSize}/>
+                                                </div>
+                                            ) : (
+                                                <div className="titleNoCars">
+                                                    <h3>There are no cars available</h3>
+                                                </div>
+                                            )
+                                        }
+                                    </div>
+                                </div>
+                            ) : (
+                                <div className="loading">
+                                    <Loading/>
+                                </div>
+                            )
+                        }
                     </div>
-                    {
-                        pageCars.length !== 0 ? (
-                            <div className="table">
-                                <CarsTable data={pageCars} tableHead={tableHead}  api="carslist" handleDelete={handleDelete} userType={userType}/>
-                                <Pagination itemsCount={totalCount} pageSize={pageSize} currentPage={currentPage} onPageChange={handlePageChange} handleNumItems={handleNumItems} numItems={pageSize}/>
-                            </div>
-                        ) : (
-                            <div className="titleNoCars">
-                                <h3>There are no cars available</h3>
-                            </div>
-                        )
-                    }
-                </div>
-            </div>
+                ) : (
+                    <Redirect to="/login"/>
+                )
+            }
         </div>
     )
 }
@@ -204,7 +223,7 @@ const mapStateToProps = (state) => ({
     cars: state.cars, 
     allCars: state.allCars,
     brands: state.brands,
-    setRedirectToLogin: state.setRedirectToLogin
+    redirectToLogin: state.redirectToLogin
 });
 
 

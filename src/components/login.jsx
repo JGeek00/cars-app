@@ -3,11 +3,20 @@ import {Link} from 'react-router-dom';
 import axios from 'axios';
 import config from '../config.json';
 import {ToastContainer, toast} from 'react-toastify';
+import {connect, useDispatch} from 'react-redux';
 
-function Login (props) {
+import {setRedirectToLogin} from '../store';
+
+const mapDispatch = { setRedirectToLogin};
+
+function Login ({history, onLogin, redirectToLogin, setRedirectToLogin}) {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [submitStatus, setSubmitStatus] = useState(true);
+
+    if (redirectToLogin === true) {
+        setRedirectToLogin(false);
+    }
 
     const handleChange = (e) => {
         const {name, value} = e.target;
@@ -35,8 +44,8 @@ function Login (props) {
                 });
                 if (response.data.result === "success") {
                     window.sessionStorage.setItem('token', response.data.token);
-                    props.onLogin(response.data.userData);
-                    props.history.push('/home');
+                    onLogin(response.data.userData);
+                    history.push('/home');
                 }
                 else if (response.data.result === "fail" && response.data.message === "password-not-match") {
                     toast.error("Invalid password");
@@ -69,5 +78,9 @@ function Login (props) {
         </div>
     );
 }
- 
-export default Login;
+
+const mapStateToProps = (state) => ({
+    redirectToLogin: state.redirectToLogin
+});
+
+export default connect(mapStateToProps, mapDispatch)(Login);

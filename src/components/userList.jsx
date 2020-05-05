@@ -1,10 +1,11 @@
 import React, {useEffect, useState} from 'react';
 import axios from 'axios';
 import UsersTable from './usersTable';
-import {Link} from 'react-router-dom';
+import {Link, Redirect} from 'react-router-dom';
 import config from '../config.json';
 import Navbar from './navbar';
 import {ToastContainer, toast} from 'react-toastify';
+import Loading from './common/loading';
 
 import {connect, useDispatch} from 'react-redux';
 import {setUsers, setRedirectToLogin} from '../store';
@@ -16,11 +17,11 @@ function UserList ({history, userType, users, loadUsers, setUsers, redirectToLog
     const dispatch = useDispatch(); 
 
     const [tableHead, setTableHead] = useState([]);
+    const [loading, setLoading] = useState(true);
 
     const token = window.sessionStorage.getItem('token');
-    if (redirectToLogin === true || !token) {
+    if (!token) {
         dispatch(setRedirectToLogin(false));
-        history.push('/login');
     }
 
     const loadData = () => {
@@ -55,6 +56,7 @@ function UserList ({history, userType, users, loadUsers, setUsers, redirectToLog
             ]
 
             setTableHead(tableHead);
+            setLoading(false);
         }
     }
 
@@ -123,16 +125,32 @@ function UserList ({history, userType, users, loadUsers, setUsers, redirectToLog
     return (
         <div>
             <Navbar userType={userType}/>
-            <ToastContainer position="top-right"/>
-            <div className="usersListContent">
-                <div className="table">
-                    <div className="buttons">
-                        <Link to="users/new" className="btn btn-primary" api="users">Create user</Link>
-                        <button className="btn btn-primary" onClick={handleUpdate}>Refresh</button>
+            {
+                redirectToLogin === false ? (
+                    <div>
+                        <ToastContainer position="top-right"/>
+                        {
+                            loading === false ? (
+                                <div className="usersListContent">
+                                    <div className="table">
+                                        <div className="buttons">
+                                            <Link to="users/new" className="btn btn-primary" api="users">Create user</Link>
+                                            <button className="btn btn-primary" onClick={handleUpdate}>Refresh</button>
+                                        </div>
+                                        <UsersTable data={users} tableHead={tableHead} api="users" handleDelete={handleDelete}/>
+                                    </div>
+                                </div>
+                            ) : (
+                                <div className="loading">
+                                    <Loading/>
+                                </div>
+                            )
+                        }
                     </div>
-                    <UsersTable data={users} tableHead={tableHead} api="users" handleDelete={handleDelete}/>
-                </div>
-            </div>
+                ) : (
+                    <Redirect to="/login"/>
+                )
+            }
         </div>
     );
 }

@@ -22,13 +22,8 @@ import {connect, useDispatch} from 'react-redux';
 import {setUser} from './store';
 const mapDispatch = {setUser, loadUser};
 
-function App ({history, user, setUser, loadUser, redirectToLogin}) {
+function App ({history, user, setUser, loadUser}) {
 	const dispatch = useDispatch(); 
-
-	if (redirectToLogin === true) {
-		redirectToLogin(false);
-		history.push('/login');
-	}
 
 	const loadData = () => {
 		return () => {

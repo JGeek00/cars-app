@@ -1,7 +1,8 @@
-import React, {useEffect} from 'react';
+import React, {useState, useEffect} from 'react';
 import BrandsTable from './brandsTable';
-import {Link, useHistory} from 'react-router-dom';
+import {Link, Redirect} from 'react-router-dom';
 import Navbar from './navbar';
+import Loading from './common/loading';
 
 import {connect, useDispatch} from 'react-redux';
 import {loadBrands} from '../actions/loadBrands';
@@ -11,17 +12,18 @@ const mapDispatch = {loadBrands, setRedirectToLogin};
 
 function BrandsList ({userType, brands, loadBrands, redirectToLogin, setRedirectToLogin}) {
     const dispatch = useDispatch(); 
-    const history = useHistory();
+
+    const [loading, setLoading] = useState(true);
 
     const token = window.sessionStorage.getItem('token');
-    if (redirectToLogin === true || !token) {
-        dispatch(setRedirectToLogin(false));
-        history.push('/login');
+    if (!token) {
+        dispatch(setRedirectToLogin(true));
     }
 
     const loadData = () => {
         return () => {
             loadBrands();
+            setLoading(false);
         }
     }
 
@@ -31,21 +33,37 @@ function BrandsList ({userType, brands, loadBrands, redirectToLogin, setRedirect
 
     return (
         <div>
-            <Navbar userType={userType}/>
-            <div className="contentBrandsList">
-                <div className="contentTop">
-                    {
-                        userType === "admin" ? (
-                            <Link to="brands/new" className="btn btn-primary">Create brand</Link>
-                        ) : (
-                            <React.Fragment/>
-                        )
-                    }
-                </div>
-                <div>
-                    <BrandsTable brands={brands}/>
-                </div>
-            </div>
+            {
+                redirectToLogin === false ? (
+                    <div>
+                        <Navbar userType={userType}/>
+                        {
+                            loading === false ? (
+                                <div className="contentBrandsList">
+                                    <div className="contentTop">
+                                        {
+                                            userType === "admin" ? (
+                                                <Link to="brands/new" className="btn btn-primary">Create brand</Link>
+                                            ) : (
+                                                <React.Fragment/>
+                                            )
+                                        }
+                                    </div>
+                                    <div>
+                                        <BrandsTable brands={brands}/>
+                                    </div>
+                                </div>
+                            ) : (
+                                <div className="loading">
+                                    <Loading/>
+                                </div>
+                            )
+                        }
+                    </div>
+                ) : (
+                    <Redirect to="/login"/>
+                )
+            }
         </div>
     );
 }

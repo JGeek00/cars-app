@@ -58,7 +58,7 @@ const carsSlice = createSlice({
             reducer(state, action) {
                 return {
                     ...state,
-                    setRedirectToLogin: action.payload
+                    redirectToLogin: action.payload
                 }
             }
         }
