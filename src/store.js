@@ -38,6 +38,14 @@ const carsSlice = createSlice({
                 }
             }
         },
+        addCar: {
+            reducer(state, action) {
+                return {
+                    ...state,
+                    allCars: state.allcars.concat(action.payload).sort()
+                }
+            }
+        },
         setBrands: {
             reducer(state, action) {
                 return {
@@ -65,7 +73,7 @@ const carsSlice = createSlice({
     }
 })
 
-export const {setUser, setCars, setAllCars, setBrands, setUsers, setRedirectToLogin} = carsSlice.actions;
+export const {setUser, setCars, setAllCars, addCar, setBrands, setUsers, setRedirectToLogin} = carsSlice.actions;
 
 const middlewareEnhancer = applyMiddleware(thunkMiddleware);
 

@@ -2,15 +2,25 @@ import React, {useEffect, useState} from 'react';
 import axios from "axios";
 import { toast, ToastContainer } from 'react-toastify';
 import config from '../config.json';
+import {Redirect} from 'react-router-dom';
 
 import {connect, useDispatch} from 'react-redux';
 
-function CarForm ({history, brands, userType, match}) {
+import {addCar, setRedirectToLogin} from '../store';
+import {loadCars} from '../actions/loadCars';
+const mapDispatch = {addCar, setRedirectToLogin, loadCars};
+
+function CarForm ({history, brands, userType, match, addCar, redirectToLogin, setRedirectToLogin, loadCars}) {
     const dispatch = useDispatch(); 
 
     const [id, setId] = useState('');
     const [model, setModel] = useState('');
     const [brand, setBrand] = useState('');
+
+    const token = window.sessionStorage.getItem('token');
+    if (!token) {
+        dispatch(setRedirectToLogin(true));
+    }
 
     const loadData = () => {
         return () => {
@@ -56,11 +66,18 @@ function CarForm ({history, brands, userType, match}) {
                 }
             });
             if (result.data.result === "success") {
+                // const id = result.data._id;
+                // const newCar = {
+                //     _id: id,
+                //     model: updatedCar.model,
+                //     brand: updatedCar.brand
+                // }
+                // dispatch(addCar(newCar));
                 history.push('/carslist');
             }
             else if (result.data.result === "fail" && result.data.message === "no-token") { 
                 window.sessionStorage.removeItem('token');
-                history.push('/login');
+                dispatch(setRedirectToLogin(true));
             }
             else if (result.data.result === "fail" && result.data.message !== "no-token") {
                 toast.error("An error occurred while creating the car");
@@ -77,12 +94,13 @@ function CarForm ({history, brands, userType, match}) {
             }
             else if (result.data.result === "fail" && result.data.message === "no-token") { 
                 window.sessionStorage.removeItem('token');
-                history.push('/login');
+                dispatch(setRedirectToLogin(true));
             }
             else if (result.data.result === "fail" && result.data.message !== "no-token") {
                 toast.error("An error occurred while updating the car");
             }
         }
+        loadCars();
     }
     
     const handleChange = (e) => {
@@ -97,48 +115,57 @@ function CarForm ({history, brands, userType, match}) {
 
     return (
         <div className="addFormContent">
-            <ToastContainer position="top-right"/>
             {
-                userType === "user" ? (
-                    <h3>Car info</h3>
+                redirectToLogin === false ? (
+                    <div>
+                        <ToastContainer position="top-right"/>
+                        {
+                            userType === "user" ? (
+                                <h3>Car info</h3>
+                            ) : (
+                                match.params.id === "new" ? (
+                                    <h3>Add a new car</h3>
+                                ) : (
+                                    <h3>Edit this car</h3>
+                                )
+                            )
+                        }
+                        <form>
+                            <div className="form-group">
+                                <label htmlFor="model">Model</label>
+                                <input type="text" className="form-control" name="model" id="model" value={model} onChange={handleChange} disabled={userType === "admin" ? '' : 'disabled'}/>
+                            </div>
+                            <div className="form-group">
+                                <select className="custom-select" name="brand" value={brand} onChange={handleChange} disabled={userType === "admin" ? '' : 'disabled'}>
+                                    <option value={brand === "" ? "selected" : ""}>Select a brand</option>
+                                    {
+                                        brands.map(oneBrand => (
+                                            <option value={oneBrand._id} key={oneBrand._id}>{oneBrand.name}</option>
+                                        ))
+                                    }
+                                </select>
+                            </div>
+                            {
+                                userType === "admin" ? (
+                                    <button type="button" className="btn btn-primary" onClick={handleUpdate}>Save</button>
+                                ) : (
+                                    <React.Fragment/>
+                                )
+                            }
+                        </form>
+                    </div>
                 ) : (
-                    match.params.id === "new" ? (
-                        <h3>Add a new car</h3>
-                    ) : (
-                        <h3>Edit this car</h3>
-                    )
+                    <Redirect to="/login"/>
                 )
             }
-            <form>
-                <div className="form-group">
-                    <label htmlFor="model">Model</label>
-                    <input type="text" className="form-control" name="model" id="model" value={model} onChange={handleChange} disabled={userType === "admin" ? '' : 'disabled'}/>
-                </div>
-                <div className="form-group">
-                    <select className="custom-select" name="brand" value={brand} onChange={handleChange} disabled={userType === "admin" ? '' : 'disabled'}>
-                        <option value={brand === "" ? "selected" : ""}>Select a brand</option>
-                        {
-                            brands.map(oneBrand => (
-                                <option value={oneBrand._id} key={oneBrand._id}>{oneBrand.name}</option>
-                            ))
-                        }
-                    </select>
-                </div>
-                {
-                    userType === "admin" ? (
-                        <button type="button" className="btn btn-primary" onClick={handleUpdate}>Save</button>
-                    ) : (
-                        <React.Fragment/>
-                    )
-                }
-            </form>
         </div>
     )
 }
 
 const mapStateToProps = (state) => ({
-    brands: state.brands
+    brands: state.brands,
+    redirectToLogin: state.redirectToLogin
 });
 
 
-export default connect(mapStateToProps, null)(CarForm);
+export default connect(mapStateToProps, mapDispatch)(CarForm);

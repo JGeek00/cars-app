@@ -1,4 +1,4 @@
-import React, {useEffect} from 'react';
+import React, {useState, useEffect} from 'react';
 
 import Home from "./components/home";
 import CarsList from "./components/carsList";
@@ -14,26 +14,31 @@ import BrandsForm from './components/brandsForm';
 
 import { Route, Redirect, Switch } from "react-router-dom";
 import {loadUser} from './actions/loadUser';
+import {loadBrands} from './actions/loadBrands';
+import {loadCars} from './actions/loadCars';
+import {loadUsers} from './actions/loadUsers';
 
 import 'react-toastify/dist/ReactToastify.css';
 import './css/App.css';
 
 import {connect, useDispatch} from 'react-redux';
 import {setUser} from './store';
-const mapDispatch = {setUser, loadUser};
+const mapDispatch = {setUser, loadUser, loadCars, loadBrands, loadUsers};
 
-function App ({history, user, setUser, loadUser}) {
-	const dispatch = useDispatch(); 
+function App ({user, setUser, loadUser, loadCars, loadBrands, loadUsers}) {
+	const [loaded, setLoaded] = useState(false);
 
-	const loadData = () => {
-		return () => {
-			loadUser();
+	const loadData = async () => {
+		const token = window.sessionStorage.getItem('token');
+		if (token && loaded === false) {
+			await loadUser();
+			await loadCars();
+			await loadBrands();
+			await loadUsers();
+			setLoaded(true);
 		}
 	}
-
-	useEffect(() => {
-		dispatch(loadData());
-	}, []);
+	loadData();
 
 	const onLogin = (user) => {
 		setUser(user);

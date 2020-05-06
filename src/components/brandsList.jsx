@@ -22,7 +22,6 @@ function BrandsList ({userType, brands, loadBrands, redirectToLogin, setRedirect
 
     const loadData = () => {
         return () => {
-            loadBrands();
             setLoading(false);
         }
     }

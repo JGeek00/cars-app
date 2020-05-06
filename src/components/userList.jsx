@@ -29,8 +29,6 @@ function UserList ({history, userType, users, loadUsers, setUsers, redirectToLog
             if (userType !== "admin") {
                 history.push('/home');
             }
-        
-            loadUsers();
             
             const tableHead = [
                 {

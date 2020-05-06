@@ -11,11 +11,10 @@ import Loading from './common/loading';
 
 import {connect, useDispatch} from 'react-redux';
 import {setCars, setAllCars, setRedirectToLogin} from '../store';
-import {loadCars} from '../actions/loadCars';
 
-const mapDispatch = {setCars, setAllCars, loadCars, setRedirectToLogin};
+const mapDispatch = {setCars, setAllCars, setRedirectToLogin};
 
-const CarsList = ({userType, history, loadCars, cars, allCars, brands, setCars, setAllCars, redirectToLogin, setRedirectToLogin}) => {
+const CarsList = ({userType, history, cars, allCars, brands, setCars, setAllCars, redirectToLogin, setRedirectToLogin}) => {
     const dispatch = useDispatch(); 
     
     const [tableHead, setTableHead] = useState([]);
@@ -32,8 +31,6 @@ const CarsList = ({userType, history, loadCars, cars, allCars, brands, setCars, 
 
     const fetchData = () => {
         return () => {
-            loadCars();
-    
             const tableHead = [
                 {
                     "id:": 1,
@@ -45,6 +42,10 @@ const CarsList = ({userType, history, loadCars, cars, allCars, brands, setCars, 
                 },
                 {
                     "id": 3,
+                    "name": "Creation date"
+                },
+                {
+                    "id": 4,
                     "name": ""
                 }
             ]
@@ -67,7 +68,7 @@ const CarsList = ({userType, history, loadCars, cars, allCars, brands, setCars, 
         });
         if (cars.data.result === "fail" && cars.data.message === "no-token") { 
             window.sessionStorage.removeItem('token');
-            history.push('/login');
+            dispatch(setRedirectToLogin(true));
         }
 
         setCars(cars.data);
@@ -81,6 +82,10 @@ const CarsList = ({userType, history, loadCars, cars, allCars, brands, setCars, 
             {
                 "id": 2,
                 "name": "Brand"
+            },
+            {
+                "id": 3,
+                "name": "Creation date"
             }
         ]
         setTableHead(tableHead);
@@ -120,14 +125,19 @@ const CarsList = ({userType, history, loadCars, cars, allCars, brands, setCars, 
         setAllCars(newData);
 
         const token = window.sessionStorage.getItem('token');
-        const result = await axios.delete(config.apiUrl + "/cars/"+id , {
-            headers: {
-                'x-access-token': token
+        try {
+            const result = await axios.delete(config.apiUrl + "/cars/"+id , {
+                headers: {
+                    'x-access-token': token
+                }
+            });
+            if (result.data.result === "fail" && result.data.message === "no-token") { 
+                window.sessionStorage.removeItem('token');
+                history.push('/login');
             }
-        });
-        if (result.data.result === "fail" && result.data.message === "no-token") { 
-            window.sessionStorage.removeItem('token');
-            history.push('/login');
+        } catch (error) {
+            setCars(data);
+            setAllCars(data);
         }
     }
 
