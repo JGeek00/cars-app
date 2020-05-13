@@ -6,11 +6,19 @@ import thunkMiddleware from 'redux-thunk'
 const carsSlice = createSlice({
     name: 'cars-app',
     initialState: {
-        cars: [],
-        allCars: [],
-        brands: [],
+        allCars: {
+            isFetching: true,
+            data: []
+        },
+        brands: {
+            isFetching: true,
+            data: []
+        },
         user: {},
-        users: [],
+        users: {
+            isFetching: true,
+            data: []
+        },
         redirectToLogin: false
     },
     reducers: {
@@ -22,27 +30,41 @@ const carsSlice = createSlice({
                 }
             }
         },
-        setCars: {
-            reducer(state, action) {
-                return {
-                    ...state,
-                    cars: action.payload
-                }
-            }
-        },
         setAllCars: {
             reducer(state, action) {
                 return {
                     ...state,
-                    allCars: action.payload
+                    allCars: {
+                        isFetching: false,
+                        data: action.payload.map(car => {
+                            const newCar = {
+                                _id: car._id,
+                                model: car.model,
+                                brand_id: car.brand[0]._id,
+                                creationDate: car.creationDate
+                            }
+                            return newCar;
+                        })
+                    }
                 }
             }
         },
-        addCar: {
+        updateCars: {
             reducer(state, action) {
                 return {
                     ...state,
-                    allCars: state.allcars.concat(action.payload).sort()
+                    allCars: {
+                        isFetching: false,
+                        data: action.payload.map(car => {
+                            const newCar = {
+                                _id: car._id,
+                                model: car.model,
+                                brand_id: car.brand_id,
+                                creationDate: car.creationDate
+                            }
+                            return newCar;
+                        })
+                    }
                 }
             }
         },
@@ -50,7 +72,10 @@ const carsSlice = createSlice({
             reducer(state, action) {
                 return {
                     ...state,
-                    brands: action.payload
+                    brands: {
+                        isFetching: false,
+                        data: action.payload
+                    }
                 }
             }
         },
@@ -58,7 +83,10 @@ const carsSlice = createSlice({
             reducer(state, action) {
                 return {
                     ...state,
-                    users: action.payload
+                    users: {
+                        isFetching: false,
+                        data: action.payload
+                    }
                 }
             }
         },
@@ -73,7 +101,7 @@ const carsSlice = createSlice({
     }
 })
 
-export const {setUser, setCars, setAllCars, addCar, setBrands, setUsers, setRedirectToLogin} = carsSlice.actions;
+export const {setUser, setAllCars, updateCars, setBrands, setUsers, setRedirectToLogin} = carsSlice.actions;
 
 const middlewareEnhancer = applyMiddleware(thunkMiddleware);
 

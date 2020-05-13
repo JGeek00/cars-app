@@ -2,9 +2,27 @@ import React from "react";
 import carImg from '../img/car.png'
 import { Link } from "react-router-dom";
 
-function Home (props) {
+import {connect} from 'react-redux';
+
+const mapDispatch = {};
+
+function Home ({userType, user}) {
+    const handleLogout = () => {
+        window.sessionStorage.removeItem('token');
+    }
+
     return (
         <div className="homeContent">
+            {
+                window.sessionStorage.getItem('token') !== null ? (
+                    <div className="sessionButtons">
+                        <Link to="/profile" type="button" className="btn btn-light">User: {user.username}</Link>
+                        <Link to="/login" type="button" className="btn btn-light" onClick={handleLogout}>Logout</Link>
+                    </div>
+                ) : (
+                    null
+                )
+            }
             <div>
                 <div> <h3>Welcome to Cars App</h3></div>
                 <img src={carImg} alt="Logo"/>
@@ -20,7 +38,7 @@ function Home (props) {
                         <Link className="btn btn-primary" to="/carslist">Cars list</Link>
                         <Link className="btn btn-primary" to="/brands">Brands</Link>
                         {
-                            props.userType === "admin" ? (
+                            userType === "admin" ? (
                                 <Link className="btn btn-primary" to="/users">Users</Link>
                             ) : (
                                 <React.Fragment/>
@@ -29,8 +47,17 @@ function Home (props) {
                     </div>
                 )
             } 
+            <div className="aboutButton">
+                <Link to="/about" type="button" className="btn btn-light">About</Link>
+            </div>
         </div>
     )
 }
 
-export default Home
+
+const mapStateToProps = (state) => ({
+    user: state.user
+});
+ 
+
+export default connect(mapStateToProps, mapDispatch)(Home);

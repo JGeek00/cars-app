@@ -2,7 +2,7 @@ import axios from 'axios';
 import {setBrands, setRedirectToLogin} from '../store';
 import config from '../config.json';
 
-export function loadBrands(token) {
+export function loadBrands() {
     return dispatch => {
         const token = window.sessionStorage.getItem('token');
         if (!token) {
@@ -13,8 +13,10 @@ export function loadBrands(token) {
                 headers: {
                     'x-access-token': token
                 }
-            }).then(brands => {
-                dispatch(setBrands(brands.data));
+            }).then(
+                response => response.data,
+            ).then((brands) => {
+                dispatch(setBrands(brands));
             });
         }        
     }    

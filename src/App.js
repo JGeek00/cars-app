@@ -3,6 +3,7 @@ import React, {useState, useEffect} from 'react';
 import Home from "./components/home";
 import CarsList from "./components/carsList";
 import NotFound from "./components/not-found";
+import About from './components/about';
 import CarForm from "./components/carForm";
 import Login from './components/login';
 import Profile from './components/profile';
@@ -13,32 +14,30 @@ import BrandsList from './components/brandsList';
 import BrandsForm from './components/brandsForm';
 
 import { Route, Redirect, Switch } from "react-router-dom";
-import {loadUser} from './actions/loadUser';
-import {loadBrands} from './actions/loadBrands';
-import {loadCars} from './actions/loadCars';
-import {loadUsers} from './actions/loadUsers';
+
+import {loadAllData} from './actions/loadAllData';
 
 import 'react-toastify/dist/ReactToastify.css';
 import './css/App.css';
 
 import {connect, useDispatch} from 'react-redux';
-import {setUser} from './store';
-const mapDispatch = {setUser, loadUser, loadCars, loadBrands, loadUsers};
+import {setUser, setRedirectToLogin} from './store';
+const mapDispatch = {setUser, loadAllData, setRedirectToLogin};
 
-function App ({user, setUser, loadUser, loadCars, loadBrands, loadUsers}) {
-	const [loaded, setLoaded] = useState(false);
+function App ({user, setUser, loadAllData, redirectToLogin, setRedirectToLogin}) {
+	const dispatch = useDispatch(); 
 
-	const loadData = async () => {
-		const token = window.sessionStorage.getItem('token');
-		if (token && loaded === false) {
-			await loadUser();
-			await loadCars();
-			await loadBrands();
-			await loadUsers();
-			setLoaded(true);
-		}
+	const token = window.sessionStorage.getItem('token');
+
+	if (redirectToLogin === true) {
+		dispatch(setRedirectToLogin(false));
 	}
-	loadData();
+
+	useEffect(() => {
+		if (token) {
+			loadAllData();
+		}
+	}, [token]);
 
 	const onLogin = (user) => {
 		setUser(user);
@@ -48,6 +47,13 @@ function App ({user, setUser, loadUser, loadCars, loadBrands, loadUsers}) {
 		<React.Fragment>
 			<div>
 				<Switch>
+					{
+						redirectToLogin === true ? (
+							<Redirect to="/login" />
+						) : (
+							null
+						)
+					}
 					<Route path="/brands/:id" render={
 						props => <BrandsForm {...props} userType={user.type}/>
 					}/>
@@ -63,15 +69,13 @@ function App ({user, setUser, loadUser, loadCars, loadBrands, loadUsers}) {
 					<Route path="/users" render={
 						props => <UserList {...props} userType={user.type}/>
 					}/>
-					<Route path="carslist/new" render={
-						props => <CarForm {...props} userType={user.type}/>
-					}/>
 					<Route path="/carslist/:id" render={
 						props => <CarForm {...props} userType={user.type}/>
 					}/>
 					<Route path="/carslist" render={
 						props => <CarsList {...props} userType={user.type}/>
 					}/>
+					<Route path="/about" component={About}/>
 					<Route path="/profile" component={Profile}/>
 					<Route path="/login" render={
 						props => <Login {...props} onLogin={onLogin}/>

@@ -13,12 +13,11 @@ export function loadUsers(history) {
                 headers: {
                     'x-access-token': token
                 }
-            }).then((users) => {
-                if (users.data.result === "fail" && users.data.message === "no-token") {
-                    window.sessionStorage.removeItem('token');
-                    dispatch(setRedirectToLogin(true));
-                }
-                dispatch(setUsers(users.data));
+            }).then(
+                response => response.data,
+            ).then((users) => {
+
+                dispatch(setUsers(users))
             });
         }
     } 

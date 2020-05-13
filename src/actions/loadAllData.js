@@ -1,8 +1,12 @@
 import axios from 'axios';
-import config from '../config.json';
 import {setUser, setRedirectToLogin} from '../store';
+import config from '../config.json';
 
-export function loadUser() {
+import {loadCars} from './loadCars';
+import {loadBrands} from './loadBrands';
+import {loadUsers} from './loadUsers';
+
+export function loadAllData() {
     return dispatch => {
         const token = window.sessionStorage.getItem('token');
         if (token) {
@@ -15,7 +19,12 @@ export function loadUser() {
                     window.sessionStorage.removeItem('token');
                     setRedirectToLogin(true);
                 }
-                dispatch(setUser(user.data));
+                else {
+                    dispatch(setUser(user.data));
+                    dispatch(loadCars());
+                    dispatch(loadBrands());
+                    dispatch(loadUsers());
+                }
             })
         }
     }

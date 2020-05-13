@@ -28,7 +28,7 @@ const CarsTable = (props) =>{
                     data.map(element => (
                         <tr key={element._id}>
                             <td><Link to={`/${api}/${element._id}`}>{element.model}</Link></td>
-                            <td>{element.brand.map(brand => brand.name)}</td>
+                            <td>{props.brands.find(brand => brand._id === element.brand_id).name}</td>
                             <td>{convertDate(element.creationDate)}</td>
                             <td>
                                 {

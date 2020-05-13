@@ -11,25 +11,13 @@ import {setRedirectToLogin} from '../store';
 const mapDispatch = {loadBrands, setRedirectToLogin};
 
 function BrandsList ({userType, brands, loadBrands, redirectToLogin, setRedirectToLogin}) {
-    const dispatch = useDispatch(); 
-
-    const [loading, setLoading] = useState(true);
+    const dispatch = useDispatch();
 
     const token = window.sessionStorage.getItem('token');
     if (!token) {
         dispatch(setRedirectToLogin(true));
     }
-
-    const loadData = () => {
-        return () => {
-            setLoading(false);
-        }
-    }
-
-    useEffect(() => {
-        dispatch(loadData()); 
-    }, []);
-
+    
     return (
         <div>
             {
@@ -37,7 +25,7 @@ function BrandsList ({userType, brands, loadBrands, redirectToLogin, setRedirect
                     <div>
                         <Navbar userType={userType}/>
                         {
-                            loading === false ? (
+                            brands.isFetching === false ? (
                                 <div className="contentBrandsList">
                                     <div className="contentTop">
                                         {
@@ -49,7 +37,7 @@ function BrandsList ({userType, brands, loadBrands, redirectToLogin, setRedirect
                                         }
                                     </div>
                                     <div>
-                                        <BrandsTable brands={brands}/>
+                                        <BrandsTable brands={brands.data}/>
                                     </div>
                                 </div>
                             ) : (

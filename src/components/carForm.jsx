@@ -6,11 +6,11 @@ import {Redirect} from 'react-router-dom';
 
 import {connect, useDispatch} from 'react-redux';
 
-import {addCar, setRedirectToLogin} from '../store';
+import {updateCars, setRedirectToLogin} from '../store';
 import {loadCars} from '../actions/loadCars';
-const mapDispatch = {addCar, setRedirectToLogin, loadCars};
+const mapDispatch = {updateCars, setRedirectToLogin, loadCars};
 
-function CarForm ({history, brands, userType, match, addCar, redirectToLogin, setRedirectToLogin, loadCars}) {
+function CarForm ({history, brands, userType, match, updateCars, allCars, redirectToLogin, setRedirectToLogin, loadCars}) {
     const dispatch = useDispatch(); 
 
     const [id, setId] = useState('');
@@ -52,55 +52,87 @@ function CarForm ({history, brands, userType, match, addCar, redirectToLogin, se
     }, []);
 
     const handleUpdate = async () => {
-        const token = window.sessionStorage.getItem('token');
+        if (model !== '' && brand !== '') {
+            const token = window.sessionStorage.getItem('token');
 
-        const updatedCar = {
-            "model": model,
-            "brand": brand
-        }
+            const updatedCar = {
+                model: model,
+                brand: brand
+            }
 
-        if (id === "new") {
-            const result = await axios.post(config.apiUrl + '/cars', updatedCar, {
-                headers: {
-                    'x-access-token': token
+            if (id === "new") {
+                const result = await axios.post(config.apiUrl + '/cars', updatedCar, {
+                    headers: {
+                        'x-access-token': token
+                    }
+                });
+                if (result.data.result === "success") {
+                    const {id, creationDate} = result.data;
+                    const newArray = allCars.data.slice();
+                    const newCar = {
+                        _id: id,
+                        model: updatedCar.model,
+                        brand_id: updatedCar.brand,
+                        creationDate: creationDate
+                    }
+                    newArray.push(newCar);
+                    newArray.sort(function (o1,o2) {
+                        if (o1.model > o2.model) { 
+                            return 1;
+                        } 
+                        else if (o1.model < o2.model) {
+                            return -1;
+                        } 
+                        return 0;
+                    });
+                    updateCars(newArray);
+                    history.push('/carslist');
                 }
-            });
-            if (result.data.result === "success") {
-                // const id = result.data._id;
-                // const newCar = {
-                //     _id: id,
-                //     model: updatedCar.model,
-                //     brand: updatedCar.brand
-                // }
-                // dispatch(addCar(newCar));
-                history.push('/carslist');
+                else if (result.data.result === "fail" && result.data.message === "no-token") { 
+                    window.sessionStorage.removeItem('token');
+                    dispatch(setRedirectToLogin(true));
+                }
+                else if (result.data.result === "fail" && result.data.message !== "no-token") {
+                    toast.error("An error occurred while creating the car");
+                }
             }
-            else if (result.data.result === "fail" && result.data.message === "no-token") { 
-                window.sessionStorage.removeItem('token');
-                dispatch(setRedirectToLogin(true));
-            }
-            else if (result.data.result === "fail" && result.data.message !== "no-token") {
-                toast.error("An error occurred while creating the car");
+            else {
+                const newCars = allCars.data.map(car => {
+                    if (car._id === id) {
+                        const newCar = {
+                            _id: id,
+                            model: updatedCar.model,
+                            brand_id: updatedCar.brand,
+                            creationDate: car.creationDate
+                        }
+                        return newCar;
+                    }
+                    else {
+                        return car;
+                    }
+                });
+                dispatch(updateCars(newCars));
+
+                const result = await axios.put(config.apiUrl + '/cars/' + id, updatedCar, {
+                    headers: {
+                        'x-access-token': token
+                    }
+                });
+                if (result.data.result === "success") {
+                    history.push('/carslist');
+                }
+                else if (result.data.result === "fail" && result.data.message === "no-token") { 
+                    window.sessionStorage.removeItem('token');
+                    dispatch(setRedirectToLogin(true));
+                }
+                else if (result.data.result === "fail" && result.data.message !== "no-token") {
+                    toast.error("An error occurred while updating the car");
+                }
             }
         }
         else {
-            const result = await axios.put(config.apiUrl + '/cars/' + id, updatedCar, {
-                headers: {
-                    'x-access-token': token
-                }
-            });
-            if (result.data.result === "success") {
-                history.push('/carslist');
-            }
-            else if (result.data.result === "fail" && result.data.message === "no-token") { 
-                window.sessionStorage.removeItem('token');
-                dispatch(setRedirectToLogin(true));
-            }
-            else if (result.data.result === "fail" && result.data.message !== "no-token") {
-                toast.error("An error occurred while updating the car");
-            }
+            toast.warning("All fields must be filled");
         }
-        loadCars();
     }
     
     const handleChange = (e) => {
@@ -139,7 +171,7 @@ function CarForm ({history, brands, userType, match, addCar, redirectToLogin, se
                                 <select className="custom-select" name="brand" value={brand} onChange={handleChange} disabled={userType === "admin" ? '' : 'disabled'}>
                                     <option value={brand === "" ? "selected" : ""}>Select a brand</option>
                                     {
-                                        brands.map(oneBrand => (
+                                        brands.data.map(oneBrand => (
                                             <option value={oneBrand._id} key={oneBrand._id}>{oneBrand.name}</option>
                                         ))
                                     }
@@ -164,6 +196,7 @@ function CarForm ({history, brands, userType, match, addCar, redirectToLogin, se
 
 const mapStateToProps = (state) => ({
     brands: state.brands,
+    allCars: state.allCars,
     redirectToLogin: state.redirectToLogin
 });
 

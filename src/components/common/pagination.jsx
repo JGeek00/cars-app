@@ -33,7 +33,7 @@ const Pagination = ({ itemsCount, pageSize, currentPage, onPageChange, handleNum
 				<option value="4">4</option>
 				<option value="8">8</option>
 				<option value="16">16</option>
-				<option value="30">30</option>
+				<option value="32">32</option>
 				<option value="all">All</option>
          	</select>
         </nav>

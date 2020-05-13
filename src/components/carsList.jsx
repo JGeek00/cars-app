@@ -10,19 +10,30 @@ import Navbar from './navbar';
 import Loading from './common/loading';
 
 import {connect, useDispatch} from 'react-redux';
-import {setCars, setAllCars, setRedirectToLogin} from '../store';
+import {updateCars, setAllCars, setRedirectToLogin} from '../store';
 
-const mapDispatch = {setCars, setAllCars, setRedirectToLogin};
+const mapDispatch = {updateCars, setAllCars, setRedirectToLogin};
 
-const CarsList = ({userType, history, cars, allCars, brands, setCars, setAllCars, redirectToLogin, setRedirectToLogin}) => {
+const CarsList = ({userType, history, cars, allCars, setAllCars, brands, updateCars, redirectToLogin, setRedirectToLogin}) => {
     const dispatch = useDispatch(); 
+
+
+    const [displayCars, setDisplayCars] = useState([]);
     
+
+    useEffect(() => {
+        setDisplayCars(allCars.data)
+    }, [allCars]);
+
+    const {data, isFetching} = allCars;
+
+
     const [tableHead, setTableHead] = useState([]);
     const [selectedBrand, setSelectedBrand] = useState('');
     const [searchQuery, setSearchQuery] = useState('');
     const [currentPage, setCurrentPage] = useState(1);
     const [pageSize, setPageSize] = useState(8);
-    const [loading, setLoading] = useState(true);
+
 
     const token = window.sessionStorage.getItem('token');
     if (!token) {
@@ -51,7 +62,6 @@ const CarsList = ({userType, history, cars, allCars, brands, setCars, setAllCars
             ]
 
             setTableHead(tableHead);
-            setLoading(false);
         }
     }
 
@@ -71,7 +81,6 @@ const CarsList = ({userType, history, cars, allCars, brands, setCars, setAllCars
             dispatch(setRedirectToLogin(true));
         }
 
-        setCars(cars.data);
         setAllCars(cars.data);
 
         const tableHead = [
@@ -93,24 +102,20 @@ const CarsList = ({userType, history, cars, allCars, brands, setCars, setAllCars
 
     const handleFilter = (brand) => {
         if (brand === "all") {
-            setCars(allCars);
+            setDisplayCars(data);
             setSelectedBrand("");
         }
         else {
-            setCars(allCars);
+            setDisplayCars(data);
             setSelectedBrand(brand);
 
-            const cars = allCars;
             let filteredCars = [];
-            for (let car of cars) {
-                for (let eachBrand of car.brand) {
-                    if (eachBrand._id === brand) {
-                        filteredCars.push(car);
-                    }
+            for (let car of data) {
+                if (car.brand_id === brand) {
+                    filteredCars.push(car);
                 }
             }
-            
-            setCars(filteredCars);
+            setDisplayCars(filteredCars);
             setCurrentPage(1);
             setSearchQuery("");
             setPageSize(8);
@@ -118,11 +123,11 @@ const CarsList = ({userType, history, cars, allCars, brands, setCars, setAllCars
     }
 
     const handleDelete = async (id) => {
-        const data = cars;
+        const oldData = data;
         const newData = data.filter(car => car._id !== id);
 
-        setCars(newData);
-        setAllCars(newData);
+        setDisplayCars(newData);
+        updateCars(newData);
 
         const token = window.sessionStorage.getItem('token');
         try {
@@ -136,24 +141,24 @@ const CarsList = ({userType, history, cars, allCars, brands, setCars, setAllCars
                 history.push('/login');
             }
         } catch (error) {
-            setCars(data);
-            setAllCars(data);
+            setDisplayCars(oldData);
+            updateCars(oldData);
         }
     }
 
     const handleSearch = (e) => {
         var {value} = e.target;
         value = value.toLowerCase();
-        const filteredCars = allCars.filter(car => car.model.toLowerCase().indexOf(value.toLowerCase()) !== -1);
+        const filteredCars = data.filter(car => car.model.toLowerCase().indexOf(value.toLowerCase()) !== -1);
 
-        setCars(filteredCars);
+        setDisplayCars(filteredCars);
         setCurrentPage(1);
         setSearchQuery(value);
     }
 
     const getPagedData = () => {
-        const paginatedCars = paginate(cars, currentPage, pageSize);
-        return {pageCars: paginatedCars, totalCount: cars.length};
+        const paginatedCars = paginate(displayCars, currentPage, pageSize);
+        return {pageCars: paginatedCars, totalCount: displayCars.length};
     };
 
     const handlePageChange = (page) => {
@@ -162,10 +167,10 @@ const CarsList = ({userType, history, cars, allCars, brands, setCars, setAllCars
 
     const handleNumItems = (e) => {
         if (e.target.value === 'all') {
-            setPageSize(cars.length);
+            setPageSize(allCars.data.length);
         }
         else {
-            setPageSize(e.target.value);
+            setPageSize(parseInt(e.target.value));
         }
     }
 
@@ -173,51 +178,52 @@ const CarsList = ({userType, history, cars, allCars, brands, setCars, setAllCars
     
     return(
         <div>
-            {console.log(redirectToLogin)}
             {
                 redirectToLogin === false ? (
                     <div>
                         <Navbar userType={userType}/>
                         {
-                            loading === false ? (
-                                <div className="carsListContent">
-                                    <div className="filter">
-                                        <FilterList data={brands} handleFilter={handleFilter} selectedItem={selectedBrand} />
-                                    </div>
-                                    <div className="listContent">
-                                        <div className="topElements">
-                                            <div className="buttons">
-                                                {
-                                                    userType === "admin" ? (
-                                                        <Link to="carslist/new" className="btn btn-primary btnNew">Create car</Link>
-                                                    ) : (
-                                                        <React.Fragment/>
-                                                    )
-                                                }
-                                                <button className="btn btn-primary" onClick={handleUpdate}>Refresh</button>
-                                            </div>
-                                            <div className="searchBox">
-                                                <input type="text" className="form-control" id="searchBox" placeholder="Search" value={searchQuery} onChange={handleSearch}/>
-                                            </div>
+                            brands.isFetching === false ? (
+                                allCars.isFetching === false ? (
+                                    <div className="carsListContent">
+                                        <div className="filter">
+                                            <FilterList data={brands.data} handleFilter={handleFilter} selectedItem={selectedBrand} />
                                         </div>
-                                        {
-                                            pageCars.length !== 0 ? (
-                                                <div className="table">
-                                                    <CarsTable data={pageCars} tableHead={tableHead}  api="carslist" handleDelete={handleDelete} userType={userType}/>
-                                                    <Pagination itemsCount={totalCount} pageSize={pageSize} currentPage={currentPage} onPageChange={handlePageChange} handleNumItems={handleNumItems} numItems={pageSize}/>
+                                        <div className="listContent">
+                                            <div className="topElements">
+                                                <div className="buttons">
+                                                    {
+                                                        userType === "admin" ? (
+                                                            <Link to="carslist/new" className="btn btn-primary btnNew">Create car</Link>
+                                                        ) : (
+                                                            <React.Fragment/>
+                                                        )
+                                                    }
+                                                    <button className="btn btn-primary" onClick={handleUpdate}>Refresh</button>
                                                 </div>
-                                            ) : (
-                                                <div className="titleNoCars">
-                                                    <h3>There are no cars available</h3>
+                                                <div className="searchBox">
+                                                    <input type="text" className="form-control" id="searchBox" placeholder="Search" value={searchQuery} onChange={handleSearch}/>
                                                 </div>
-                                            )
-                                        }
+                                            </div>
+                                            {
+                                                pageCars.length !== 0 ? (
+                                                    <div className="table">
+                                                        <CarsTable data={pageCars} brands={brands.data} tableHead={tableHead}  api="carslist" handleDelete={handleDelete} userType={userType}/>
+                                                        <Pagination itemsCount={totalCount} pageSize={pageSize} currentPage={currentPage} onPageChange={handlePageChange} handleNumItems={handleNumItems} numItems={pageSize}/>
+                                                    </div>
+                                                ) : (
+                                                    <div className="titleNoCars">
+                                                        <h3>There are no cars available</h3>
+                                                    </div>
+                                                )
+                                            }
+                                        </div>
                                     </div>
-                                </div>
-                            ) : (
-                                <div className="loading">
+                                ) : (
                                     <Loading/>
-                                </div>
+                                )
+                            ) : (
+                                <Loading/>
                             )
                         }
                     </div>

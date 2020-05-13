@@ -17,7 +17,6 @@ function UserList ({history, userType, users, loadUsers, setUsers, redirectToLog
     const dispatch = useDispatch(); 
 
     const [tableHead, setTableHead] = useState([]);
-    const [loading, setLoading] = useState(true);
 
     const token = window.sessionStorage.getItem('token');
     if (!token) {
@@ -54,7 +53,6 @@ function UserList ({history, userType, users, loadUsers, setUsers, redirectToLog
             ]
 
             setTableHead(tableHead);
-            setLoading(false);
         }
     }
 
@@ -128,14 +126,14 @@ function UserList ({history, userType, users, loadUsers, setUsers, redirectToLog
                     <div>
                         <ToastContainer position="top-right"/>
                         {
-                            loading === false ? (
+                            users.isFetching === false ? (
                                 <div className="usersListContent">
                                     <div className="table">
                                         <div className="buttons">
                                             <Link to="users/new" className="btn btn-primary" api="users">Create user</Link>
                                             <button className="btn btn-primary" onClick={handleUpdate}>Refresh</button>
                                         </div>
-                                        <UsersTable data={users} tableHead={tableHead} api="users" handleDelete={handleDelete}/>
+                                        <UsersTable data={users.data} tableHead={tableHead} api="users" handleDelete={handleDelete}/>
                                     </div>
                                 </div>
                             ) : (
