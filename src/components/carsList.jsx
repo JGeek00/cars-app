@@ -10,30 +10,24 @@ import Navbar from './navbar';
 import Loading from './common/loading';
 
 import {connect, useDispatch} from 'react-redux';
-import {updateCars, setAllCars, setRedirectToLogin} from '../store';
+import {setAllCars, deleteCar, setRedirectToLogin} from '../store';
 
-const mapDispatch = {updateCars, setAllCars, setRedirectToLogin};
+const mapDispatch = {setAllCars, deleteCar, setRedirectToLogin};
 
-const CarsList = ({userType, history, cars, allCars, setAllCars, brands, updateCars, redirectToLogin, setRedirectToLogin}) => {
-    const dispatch = useDispatch(); 
-
-
-    const [displayCars, setDisplayCars] = useState([]);
+const CarsList = ({userType, history, allCars, carIds, setAllCars, deleteCar, brands, brandIds, redirectToLogin, setRedirectToLogin}) => {
+    const dispatch = useDispatch();
     
-
-    useEffect(() => {
-        setDisplayCars(allCars.data)
-    }, [allCars]);
-
-    const {data, isFetching} = allCars;
-
-
+    const [displayCars, setDisplayCars] = useState([]);
     const [tableHead, setTableHead] = useState([]);
     const [selectedBrand, setSelectedBrand] = useState('');
     const [searchQuery, setSearchQuery] = useState('');
     const [currentPage, setCurrentPage] = useState(1);
     const [pageSize, setPageSize] = useState(8);
+    const {data, isFetching} = allCars;
 
+    useEffect(() => {
+        setDisplayCars(carIds)
+    }, [carIds]);
 
     const token = window.sessionStorage.getItem('token');
     if (!token) {
@@ -69,19 +63,8 @@ const CarsList = ({userType, history, cars, allCars, setAllCars, brands, updateC
         dispatch(fetchData());
     }, []);
 
-    const handleUpdate = async () => {
-        const token = window.sessionStorage.getItem('token');
-        const cars = await axios.get(config.apiUrl + "/cars", {
-            headers: {
-                'x-access-token': token
-            }
-        });
-        if (cars.data.result === "fail" && cars.data.message === "no-token") { 
-            window.sessionStorage.removeItem('token');
-            dispatch(setRedirectToLogin(true));
-        }
-
-        setAllCars(cars.data);
+    const handleUpdate = () => {
+        dispatch(fetchData());
 
         const tableHead = [
             {
@@ -102,24 +85,23 @@ const CarsList = ({userType, history, cars, allCars, setAllCars, brands, updateC
 
     const handleFilter = (brand) => {
         if (brand === "all") {
-            setDisplayCars(data);
+            setDisplayCars(carIds);
             setSelectedBrand("");
         }
         else {
-            setDisplayCars(data);
+            setDisplayCars(carIds);
             setSelectedBrand(brand);
 
-            let filteredCars = [];
-            for (let car of data) {
-                if (car.brand_id === brand) {
-                    filteredCars.push(car);
+            let filteredCarsIds = [];
+            for (let id of carIds) {
+                if (data[id].brand_id === brand) {
+                    filteredCarsIds.push(id);
                 }
             }
-            setDisplayCars(filteredCars);
-            setCurrentPage(1);
-            setSearchQuery("");
-            setPageSize(8);
+            setDisplayCars(filteredCarsIds);
         }
+        setCurrentPage(1);
+        setSearchQuery("");
     }
 
     const handleDelete = async (id) => {
@@ -127,7 +109,7 @@ const CarsList = ({userType, history, cars, allCars, setAllCars, brands, updateC
         const newData = data.filter(car => car._id !== id);
 
         setDisplayCars(newData);
-        updateCars(newData);
+        deleteCar(newData);
 
         const token = window.sessionStorage.getItem('token');
         try {
@@ -142,7 +124,7 @@ const CarsList = ({userType, history, cars, allCars, setAllCars, brands, updateC
             }
         } catch (error) {
             setDisplayCars(oldData);
-            updateCars(oldData);
+            deleteCar(oldData);
         }
     }
 
@@ -187,14 +169,14 @@ const CarsList = ({userType, history, cars, allCars, setAllCars, brands, updateC
                                 allCars.isFetching === false ? (
                                     <div className="carsListContent">
                                         <div className="filter">
-                                            <FilterList data={brands.data} handleFilter={handleFilter} selectedItem={selectedBrand} />
+                                            <FilterList data={brands.data} ids={brandIds} handleFilter={handleFilter} selectedItem={selectedBrand} />
                                         </div>
                                         <div className="listContent">
                                             <div className="topElements">
                                                 <div className="buttons">
                                                     {
                                                         userType === "admin" ? (
-                                                            <Link to="carslist/new" className="btn btn-primary btnNew">Create car</Link>
+                                                            <Link to="/carslist/new" className="btn btn-primary btnNew">Create car</Link>
                                                         ) : (
                                                             <React.Fragment/>
                                                         )
@@ -208,7 +190,7 @@ const CarsList = ({userType, history, cars, allCars, setAllCars, brands, updateC
                                             {
                                                 pageCars.length !== 0 ? (
                                                     <div className="table">
-                                                        <CarsTable data={pageCars} brands={brands.data} tableHead={tableHead}  api="carslist" handleDelete={handleDelete} userType={userType}/>
+                                                        <CarsTable ids={pageCars} cars={allCars.data} brands={brands.data} tableHead={tableHead}  api="carslist" handleDelete={handleDelete} userType={userType}/>
                                                         <Pagination itemsCount={totalCount} pageSize={pageSize} currentPage={currentPage} onPageChange={handlePageChange} handleNumItems={handleNumItems} numItems={pageSize}/>
                                                     </div>
                                                 ) : (
@@ -236,9 +218,10 @@ const CarsList = ({userType, history, cars, allCars, setAllCars, brands, updateC
 }
 
 const mapStateToProps = (state) => ({
-    cars: state.cars, 
+    carIds: state.carIds,
     allCars: state.allCars,
     brands: state.brands,
+    brandIds: state.brandIds,
     redirectToLogin: state.redirectToLogin
 });
 

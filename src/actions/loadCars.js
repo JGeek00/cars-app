@@ -1,5 +1,5 @@
 import axios from 'axios';
-import {setAllCars, setCars} from '../store';
+import {setAllCars, setCarIds} from '../store';
 import config from '../config.json';
 
 export function loadCars () {
@@ -12,7 +12,27 @@ export function loadCars () {
         }).then(
             response => response.data,
         ).then((cars) => {
-            dispatch(setAllCars(cars));
+            const idsArray = new Array();
+            const convertArrayToObject = (array) => {
+                const initialValue = {};
+                return array.reduce((obj, item) => {
+                    const key = item._id;
+                    idsArray.push(key);
+                    var newItem = {
+                        _id: item._id,
+                        model: item.model,
+                        brand_id: item.brand[0]._id,
+                        creationDate: item.creationDate
+                    }
+                    return {
+                        ...obj,
+                        [key]: newItem,
+                    };
+                }, initialValue);
+            };
+            const newObject = convertArrayToObject(cars);
+            dispatch(setCarIds(idsArray));
+            dispatch(setAllCars(newObject));
         });
     }
 }

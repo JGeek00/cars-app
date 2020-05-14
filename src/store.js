@@ -6,10 +6,12 @@ import thunkMiddleware from 'redux-thunk'
 const carsSlice = createSlice({
     name: 'cars-app',
     initialState: {
+        carIds: [],
         allCars: {
             isFetching: true,
-            data: []
+            data: {}
         },
+        brandIds: [],
         brands: {
             isFetching: true,
             data: []
@@ -36,34 +38,72 @@ const carsSlice = createSlice({
                     ...state,
                     allCars: {
                         isFetching: false,
-                        data: action.payload.map(car => {
-                            const newCar = {
-                                _id: car._id,
-                                model: car.model,
-                                brand_id: car.brand[0]._id,
-                                creationDate: car.creationDate
-                            }
-                            return newCar;
-                        })
+                        data: action.payload
                     }
                 }
             }
         },
-        updateCars: {
+        setCarIds: {
             reducer(state, action) {
+                return {
+                    ...state,
+                    carIds: action.payload
+                }
+            }
+        },
+        addCar: {
+            reducer(state, action) {
+                const newObject = {
+                    ...state.allCars.data,
+                    [action.payload.id]: action.payload.newCar
+                }
                 return {
                     ...state,
                     allCars: {
                         isFetching: false,
-                        data: action.payload.map(car => {
-                            const newCar = {
-                                _id: car._id,
-                                model: car.model,
-                                brand_id: car.brand_id,
-                                creationDate: car.creationDate
-                            }
-                            return newCar;
-                        })
+                        data: newObject
+                    }
+                }
+            }
+        },
+        addCarId: {
+            reducer(state, action) {
+                var newIds = [...state.carIds];
+                newIds.push(action.payload)
+                newIds.sort((o1, o2) => {
+                    const car1name = state.allCars.data[o1].model;
+                    const car2name = state.allCars.data[o2].model;
+                    if (car1name < car2name) {
+                        return -1;
+                    }
+                    if (car1name > car2name) {
+                        return 1;
+                    }
+                    return 0;
+                });
+                return {
+                    ...state,
+                    carIds: newIds
+                }
+            }
+        },
+        updateCar: {
+            reducer(state, action) {
+                var newObject = {
+                    _id: action.payload.id,
+                    model: action.payload.updatedCar.model,
+                    brand_id: action.payload.updatedCar.brand
+                };
+                const updatedObject = {
+                    ...state.allCars.data,
+                    [action.payload.id]: newObject,
+                }
+                
+                return {
+                    ...state,
+                    allCars: {
+                        isFetching: false,
+                        data: updatedObject
                     }
                 }
             }
@@ -76,6 +116,41 @@ const carsSlice = createSlice({
                         isFetching: false,
                         data: action.payload
                     }
+                }
+            }
+        },
+        setBrandIds: {
+            reducer(state, action) {
+                return {
+                    ...state,
+                    brandIds: action.payload
+                }
+            }
+        },
+        sortCars: {
+            reducer(state, action) {
+                var ids = [...state.carIds];
+                ids.sort((o1, o2) => {
+                    const car1name = state.allCars.data[o1].model;
+                    const car2name = state.allCars.data[o2].model;
+                    if (car1name < car2name) {
+                        return -1;
+                    }
+                    if (car1name > car2name) {
+                        return 1;
+                    }
+                    return 0;
+                });
+                return {
+                    ...state,
+                    carIds: ids
+                }
+            }
+        },
+        deleteCar: {
+            reducer(state, action) {
+                return {
+                    ...state
                 }
             }
         },
@@ -101,7 +176,7 @@ const carsSlice = createSlice({
     }
 })
 
-export const {setUser, setAllCars, updateCars, setBrands, setUsers, setRedirectToLogin} = carsSlice.actions;
+export const {setUser, setAllCars, setCarIds, updateCar, addCar, addCarId, sortCars, deleteCar, setBrands, setBrandIds, setUsers, setRedirectToLogin} = carsSlice.actions;
 
 const middlewareEnhancer = applyMiddleware(thunkMiddleware);
 

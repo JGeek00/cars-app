@@ -2,7 +2,7 @@ import React from "react";
 import PropTypes from "prop-types";
 import _ from "lodash";
 
-const Pagination = ({ itemsCount, pageSize, currentPage, onPageChange, handleNumItems, selectedPageSize }) => {
+const Pagination = ({ itemsCount, pageSize, currentPage, onPageChange, handleNumItems}) => {
     const pagesCount = Math.ceil(itemsCount / pageSize);
 	const pages = _.range(1, pagesCount + 1);
 	
@@ -29,7 +29,7 @@ const Pagination = ({ itemsCount, pageSize, currentPage, onPageChange, handleNum
 					</li>
 				))}
           	</ul>
-        	<select className="custom-select" defaultValue="8" onChange={handleNumItems} style={style} value={selectedPageSize}>
+        	<select className="custom-select" onChange={handleNumItems} style={style} value={pageSize}>
 				<option value="4">4</option>
 				<option value="8">8</option>
 				<option value="16">16</option>

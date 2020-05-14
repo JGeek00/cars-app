@@ -1,5 +1,5 @@
 import axios from 'axios';
-import {setBrands, setRedirectToLogin} from '../store';
+import {setBrands, setBrandIds, setRedirectToLogin} from '../store';
 import config from '../config.json';
 
 export function loadBrands() {
@@ -16,7 +16,25 @@ export function loadBrands() {
             }).then(
                 response => response.data,
             ).then((brands) => {
-                dispatch(setBrands(brands));
+                var brandIds = [];
+                const convertArrayToObject = (brands) => {
+                    const initialValue = {};
+                    return brands.reduce((obj, item) => {
+                        const key = item._id;
+                        brandIds.push(key);
+                        var newItem = {
+                            _id: item._id,
+                            name: item.name
+                        }
+                        return {
+                            ...obj,
+                            [key]: newItem,
+                        };
+                    }, initialValue);
+                };
+                const newObject = convertArrayToObject(brands);
+                dispatch(setBrands(newObject));
+                dispatch(setBrandIds(brandIds));
             });
         }        
     }    

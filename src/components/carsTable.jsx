@@ -1,4 +1,4 @@
-import React, {Component} from "react";
+import React from "react";
 import {Link} from "react-router-dom";
 import Delete from './common/delete'
 
@@ -11,7 +11,7 @@ const CarsTable = (props) =>{
         }
     }
 
-    const {data, tableHead, handleDelete, api} = props;
+    const {ids, cars, brands, tableHead, handleDelete, api} = props;
     return(
         <table className="table">
             <thead>
@@ -25,15 +25,15 @@ const CarsTable = (props) =>{
             </thead>
             <tbody>
                 {
-                    data.map(element => (
-                        <tr key={element._id}>
-                            <td><Link to={`/${api}/${element._id}`}>{element.model}</Link></td>
-                            <td>{props.brands.find(brand => brand._id === element.brand_id).name}</td>
-                            <td>{convertDate(element.creationDate)}</td>
+                    ids.map(id => (
+                        <tr key={id}>
+                            <td><Link to={`/${api}/${id}`}>{cars[id].model}</Link></td>
+                            <td>{brands[cars[id].brand_id].name}</td>
+                            <td>{convertDate(cars[id].creationDate)}</td>
                             <td>
                                 {
                                     props.userType === "admin" ? (
-                                        <Delete id={element._id} data={data} handleDelete={handleDelete}/>
+                                        <Delete id={id} data={cars[id]} handleDelete={handleDelete}/>
                                     ) : (
                                         <React.Fragment/>
                                     )
