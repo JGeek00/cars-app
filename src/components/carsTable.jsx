@@ -12,6 +12,7 @@ const CarsTable = (props) =>{
     }
 
     const {ids, cars, brands, tableHead, handleDelete, api} = props;
+    // console.log(ids, cars)
     return(
         <table className="table">
             <thead>
@@ -23,6 +24,7 @@ const CarsTable = (props) =>{
                     }
                 </tr>
             </thead>
+
             <tbody>
                 {
                     ids.map(id => (

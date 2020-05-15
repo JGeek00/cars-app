@@ -108,25 +108,6 @@ const carsSlice = createSlice({
                 }
             }
         },
-        setBrands: {
-            reducer(state, action) {
-                return {
-                    ...state,
-                    brands: {
-                        isFetching: false,
-                        data: action.payload
-                    }
-                }
-            }
-        },
-        setBrandIds: {
-            reducer(state, action) {
-                return {
-                    ...state,
-                    brandIds: action.payload
-                }
-            }
-        },
         sortCars: {
             reducer(state, action) {
                 var ids = [...state.carIds];
@@ -149,8 +130,110 @@ const carsSlice = createSlice({
         },
         deleteCar: {
             reducer(state, action) {
+                var newIds = [...state.carIds];
+                const index = newIds.indexOf(action.payload);
+                newIds.splice(index, 1);
+
+                var carsObject = {...state.allCars.data};
+                delete carsObject[action.payload];
+                console.log(newIds, carsObject);
                 return {
-                    ...state
+                    ...state,
+                    carIds: newIds,
+                    allCars: {
+                        isFetching: false,
+                        data: carsObject
+                    }
+                }
+            }
+        },
+        setBrands: {
+            reducer(state, action) {
+                return {
+                    ...state,
+                    brands: {
+                        isFetching: false,
+                        data: action.payload
+                    }
+                }
+            }
+        },
+        setBrandIds: {
+            reducer(state, action) {
+                return {
+                    ...state,
+                    brandIds: action.payload
+                }
+            }
+        },
+        addBrand: {
+            reducer(state, action) {
+                const newObject = {
+                    ...state.brands.data,
+                    [action.payload.id]: action.payload.newBrand
+                }
+                return {
+                    ...state,
+                    brands: {
+                        isFetching: false,
+                        data: newObject
+                    }
+                }
+            }
+        },
+        addBrandId: {
+            reducer(state, action) {
+                var newIds = [...state.brandIds];
+                newIds.push(action.payload);
+                newIds.sort((o1, o2) => {
+                    const e1 = state.brands.data[o1].name;
+                    const e2 = state.brands.data[o2].name;
+                    if (e1 < e2) {
+                        return -1;
+                    }
+                    if (e1 > e2) {
+                        return 1;
+                    }
+                    return 0;
+                });
+                return {
+                    ...state,
+                    brandIds: newIds
+                }
+            }
+        },
+        editBrand: {
+            reducer(state, action) {
+                const newObject = {
+                    ...state.brands.data,
+                    [action.payload.id]: action.payload.updatedBrand
+                }
+                return {
+                    ...state,
+                    brands: {
+                        isFetching: false,
+                        data: newObject
+                    }
+                }
+            }
+        },
+        sortBrands: {
+            reducer(state, action) {
+                var ids = [...state.brandIds];
+                ids.sort((o1, o2) => {
+                    const e1 = state.brands.data[o1].name;
+                    const e2 = state.brands.data[o2].name;
+                    if (e1 < e2) {
+                        return -1;
+                    }
+                    if (e1 > e2) {
+                        return 1;
+                    }
+                    return 0;
+                });
+                return {
+                    ...state,
+                    brandIds: ids
                 }
             }
         },
@@ -176,7 +259,7 @@ const carsSlice = createSlice({
     }
 })
 
-export const {setUser, setAllCars, setCarIds, updateCar, addCar, addCarId, sortCars, deleteCar, setBrands, setBrandIds, setUsers, setRedirectToLogin} = carsSlice.actions;
+export const {setUser, setAllCars, setCarIds, updateCar, addCar, addCarId, sortCars, deleteCar, setBrands, setBrandIds, addBrand, addBrandId, editBrand, sortBrands, setUsers, setRedirectToLogin} = carsSlice.actions;
 
 const middlewareEnhancer = applyMiddleware(thunkMiddleware);
 

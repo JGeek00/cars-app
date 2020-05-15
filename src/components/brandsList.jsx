@@ -5,12 +5,11 @@ import Navbar from './navbar';
 import Loading from './common/loading';
 
 import {connect, useDispatch} from 'react-redux';
-import {loadBrands} from '../actions/loadBrands';
 import {setRedirectToLogin} from '../store';
 
-const mapDispatch = {loadBrands, setRedirectToLogin};
+const mapDispatch = {setRedirectToLogin};
 
-function BrandsList ({userType, brands, loadBrands, redirectToLogin, setRedirectToLogin}) {
+function BrandsList ({userType, brands, brandIds, redirectToLogin, setRedirectToLogin}) {
     const dispatch = useDispatch();
 
     const token = window.sessionStorage.getItem('token');
@@ -37,7 +36,7 @@ function BrandsList ({userType, brands, loadBrands, redirectToLogin, setRedirect
                                         }
                                     </div>
                                     <div>
-                                        <BrandsTable brands={brands.data}/>
+                                        <BrandsTable brands={brands.data} ids={brandIds}/>
                                     </div>
                                 </div>
                             ) : (
@@ -57,6 +56,7 @@ function BrandsList ({userType, brands, loadBrands, redirectToLogin, setRedirect
 
 const mapStateToProps = (state) => ({
     brands: state.brands,
+    brandIds: state.brandIds,
     redirectToLogin: state.redirectToLogin
 });
 

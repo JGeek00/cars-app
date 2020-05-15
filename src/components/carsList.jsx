@@ -10,13 +10,14 @@ import Navbar from './navbar';
 import Loading from './common/loading';
 
 import {connect, useDispatch} from 'react-redux';
+import {loadCars} from '../actions/loadCars';
 import {setAllCars, deleteCar, setRedirectToLogin} from '../store';
 
-const mapDispatch = {setAllCars, deleteCar, setRedirectToLogin};
+const mapDispatch = {setAllCars, deleteCar, setRedirectToLogin, loadCars};
 
-const CarsList = ({userType, history, allCars, carIds, setAllCars, deleteCar, brands, brandIds, redirectToLogin, setRedirectToLogin}) => {
+const CarsList = ({userType, history, allCars, carIds, setAllCars, deleteCar, brands, brandIds, redirectToLogin, setRedirectToLogin, loadCars}) => {
     const dispatch = useDispatch();
-    
+    console.log("render", carIds, allCars.data)
     const [displayCars, setDisplayCars] = useState([]);
     const [tableHead, setTableHead] = useState([]);
     const [selectedBrand, setSelectedBrand] = useState('');
@@ -105,12 +106,8 @@ const CarsList = ({userType, history, allCars, carIds, setAllCars, deleteCar, br
     }
 
     const handleDelete = async (id) => {
-        const oldData = data;
-        const newData = data.filter(car => car._id !== id);
-
-        setDisplayCars(newData);
-        deleteCar(newData);
-
+        dispatch(deleteCar(id));
+        console.log("delete")
         const token = window.sessionStorage.getItem('token');
         try {
             const result = await axios.delete(config.apiUrl + "/cars/"+id , {
@@ -123,8 +120,7 @@ const CarsList = ({userType, history, allCars, carIds, setAllCars, deleteCar, br
                 history.push('/login');
             }
         } catch (error) {
-            setDisplayCars(oldData);
-            deleteCar(oldData);
+            loadCars();
         }
     }
 
@@ -139,6 +135,7 @@ const CarsList = ({userType, history, allCars, carIds, setAllCars, deleteCar, br
     }
 
     const getPagedData = () => {
+        console.log("paginatecars", displayCars);
         const paginatedCars = paginate(displayCars, currentPage, pageSize);
         return {pageCars: paginatedCars, totalCount: displayCars.length};
     };
@@ -157,7 +154,7 @@ const CarsList = ({userType, history, allCars, carIds, setAllCars, deleteCar, br
     }
 
     const { totalCount, pageCars } = getPagedData();
-    
+    console.log("pageCars", pageCars)
     return(
         <div>
             {
