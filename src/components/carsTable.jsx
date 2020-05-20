@@ -10,9 +10,9 @@ const CarsTable = (props) =>{
             return d.getDate() + "/" + d.getMonth() + "/" + d.getFullYear() + " - " + d.getHours() + ":" + d.getMinutes();
         }
     }
-
+    
     const {ids, cars, brands, tableHead, handleDelete, api} = props;
-    // console.log(ids, cars)
+
     return(
         <table className="table">
             <thead>

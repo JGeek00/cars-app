@@ -17,7 +17,7 @@ const mapDispatch = {setAllCars, deleteCar, setRedirectToLogin, loadCars};
 
 const CarsList = ({userType, history, allCars, carIds, setAllCars, deleteCar, brands, brandIds, redirectToLogin, setRedirectToLogin, loadCars}) => {
     const dispatch = useDispatch();
-    console.log("render", carIds, allCars.data)
+
     const [displayCars, setDisplayCars] = useState([]);
     const [tableHead, setTableHead] = useState([]);
     const [selectedBrand, setSelectedBrand] = useState('');
@@ -106,8 +106,11 @@ const CarsList = ({userType, history, allCars, carIds, setAllCars, deleteCar, br
     }
 
     const handleDelete = async (id) => {
-        dispatch(deleteCar(id));
-        console.log("delete")
+        deleteCar(id);
+        const newIds = carIds.filter(oneId => oneId !== id);
+        setDisplayCars(newIds);
+        setCurrentPage(1);
+        
         const token = window.sessionStorage.getItem('token');
         try {
             const result = await axios.delete(config.apiUrl + "/cars/"+id , {
@@ -135,7 +138,6 @@ const CarsList = ({userType, history, allCars, carIds, setAllCars, deleteCar, br
     }
 
     const getPagedData = () => {
-        console.log("paginatecars", displayCars);
         const paginatedCars = paginate(displayCars, currentPage, pageSize);
         return {pageCars: paginatedCars, totalCount: displayCars.length};
     };
@@ -154,7 +156,7 @@ const CarsList = ({userType, history, allCars, carIds, setAllCars, deleteCar, br
     }
 
     const { totalCount, pageCars } = getPagedData();
-    console.log("pageCars", pageCars)
+
     return(
         <div>
             {

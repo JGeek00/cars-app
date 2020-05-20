@@ -133,10 +133,10 @@ const carsSlice = createSlice({
                 var newIds = [...state.carIds];
                 const index = newIds.indexOf(action.payload);
                 newIds.splice(index, 1);
-
+                
                 var carsObject = {...state.allCars.data};
-                delete carsObject[action.payload];
-                console.log(newIds, carsObject);
+                delete carsObject[action.payload]
+                
                 return {
                     ...state,
                     carIds: newIds,
