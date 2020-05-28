@@ -16,6 +16,7 @@ function CarForm ({history, brands, brandIds, userType, match, addCar, addCarId,
     const [id, setId] = useState('');
     const [model, setModel] = useState('');
     const [brand, setBrand] = useState('');
+    const [creationDate, setCreationDate] = useState('');
 
     const token = window.sessionStorage.getItem('token');
     if (!token) {
@@ -40,6 +41,7 @@ function CarForm ({history, brands, brandIds, userType, match, addCar, addCarId,
                     setId(id);
                     setModel(car.data.model);
                     setBrand(car.data.brand);
+                    setCreationDate(car.data.creationDate);
                 })           
             }
             else {
@@ -95,7 +97,8 @@ function CarForm ({history, brands, brandIds, userType, match, addCar, addCarId,
                 const updatedCar = {
                     _id: id,
                     model: model,
-                    brand: brand
+                    brand: brand,
+                    creationDate: creationDate
                 } 
 
                 const result = await axios.put(config.apiUrl + '/cars/' + id, updatedCar, {

@@ -1,6 +1,6 @@
 import {createSlice} from '@reduxjs/toolkit';
 import {createStore, applyMiddleware,compose} from 'redux';
-import thunkMiddleware from 'redux-thunk'
+import thunkMiddleware from 'redux-thunk';
 
 
 const carsSlice = createSlice({
@@ -10,6 +10,12 @@ const carsSlice = createSlice({
         allCars: {
             isFetching: true,
             data: {}
+        },
+        carView: {
+            selectedBrand: "all",
+            currentPage: "1",
+            pageSize: "8",
+            searchQuery: ""
         },
         brandIds: [],
         brands: {
@@ -92,7 +98,8 @@ const carsSlice = createSlice({
                 var newObject = {
                     _id: action.payload.id,
                     model: action.payload.updatedCar.model,
-                    brand_id: action.payload.updatedCar.brand
+                    brand_id: action.payload.updatedCar.brand,
+                    creationDate: action.payload.updatedCar.creationDate
                 };
                 const updatedObject = {
                     ...state.allCars.data,
@@ -125,6 +132,62 @@ const carsSlice = createSlice({
                 return {
                     ...state,
                     carIds: ids
+                }
+            }
+        },
+        setCarsView: {
+            reducer(state, action) {
+                switch (action.payload.type) {
+                    case "filter":
+                        if (action.payload.data === "all" || action.payload.data === "") {
+                            return {
+                                ...state,
+                                carView: {
+                                    ...state.carView,
+                                    selectedBrand: "all",
+                                    currentPage: '1'
+                                }
+                            }
+                        }
+                        else {
+                            return {
+                                ...state,
+                                carView: {
+                                    ...state.carView,
+                                    selectedBrand: action.payload.data,
+                                    currentPage: '1'
+                                }
+                            }
+                        }
+
+                    case "search":
+                        return {
+                            ...state,
+                            carView: {
+                                ...state.carView,
+                                searchQuery: action.payload.data,
+                                currentPage: '1'
+                            }
+                        }
+
+                    case "pagechange":
+                        return {
+                            ...state,
+                            carView: {
+                                ...state.carView,
+                                currentPage: action.payload.data
+                            }
+                        }
+
+                    case "pagesize":
+                        return {
+                            ...state,
+                            carView: {
+                                ...state.carView,
+                                pageSize: action.payload.data,
+                                currentPage: '1'
+                            }
+                        }
                 }
             }
         },
@@ -259,7 +322,7 @@ const carsSlice = createSlice({
     }
 })
 
-export const {setUser, setAllCars, setCarIds, updateCar, addCar, addCarId, sortCars, deleteCar, setBrands, setBrandIds, addBrand, addBrandId, editBrand, sortBrands, setUsers, setRedirectToLogin} = carsSlice.actions;
+export const {setUser, setAllCars, setCarIds, updateCar, addCar, addCarId, sortCars, deleteCar, setCarsView, setBrands, setBrandIds, addBrand, addBrandId, editBrand, sortBrands, setUsers, setRedirectToLogin} = carsSlice.actions;
 
 const middlewareEnhancer = applyMiddleware(thunkMiddleware);
 

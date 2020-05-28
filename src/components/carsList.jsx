@@ -3,32 +3,23 @@ import CarsTable from "./carsTable";
 import {Link, Redirect} from "react-router-dom";
 import axios from "axios";
 import FilterList from "./filterList";
-import {paginate} from "../utils/pagination";
 import Pagination from './common/pagination';
 import config from "../config.json";
 import Navbar from './navbar';
 import Loading from './common/loading';
+import {filterCars} from '../selectors/filterCars';
 
 import {connect, useDispatch} from 'react-redux';
 import {loadCars} from '../actions/loadCars';
-import {setAllCars, deleteCar, setRedirectToLogin} from '../store';
+import {deleteCar, setRedirectToLogin, setCarsView} from '../store';
 
-const mapDispatch = {setAllCars, deleteCar, setRedirectToLogin, loadCars};
+const mapDispatch = {deleteCar, setCarsView, setRedirectToLogin, loadCars};
 
-const CarsList = ({userType, history, allCars, carIds, setAllCars, deleteCar, brands, brandIds, redirectToLogin, setRedirectToLogin, loadCars}) => {
+const CarsList = ({userType, history, allCars, viewCars, setCarsView, deleteCar, brands, brandIds, redirectToLogin, setRedirectToLogin, loadCars}) => {
     const dispatch = useDispatch();
 
-    const [displayCars, setDisplayCars] = useState([]);
     const [tableHead, setTableHead] = useState([]);
-    const [selectedBrand, setSelectedBrand] = useState('');
     const [searchQuery, setSearchQuery] = useState('');
-    const [currentPage, setCurrentPage] = useState(1);
-    const [pageSize, setPageSize] = useState(8);
-    const {data, isFetching} = allCars;
-
-    useEffect(() => {
-        setDisplayCars(carIds)
-    }, [carIds]);
 
     const token = window.sessionStorage.getItem('token');
     if (!token) {
@@ -85,31 +76,19 @@ const CarsList = ({userType, history, allCars, carIds, setAllCars, deleteCar, br
     }
 
     const handleFilter = (brand) => {
-        if (brand === "all") {
-            setDisplayCars(carIds);
-            setSelectedBrand("");
-        }
-        else {
-            setDisplayCars(carIds);
-            setSelectedBrand(brand);
-
-            let filteredCarsIds = [];
-            for (let id of carIds) {
-                if (data[id].brand_id === brand) {
-                    filteredCarsIds.push(id);
-                }
-            }
-            setDisplayCars(filteredCarsIds);
-        }
-        setCurrentPage(1);
-        setSearchQuery("");
+        setSearchQuery('');
+        setCarsView({
+            type: "search",
+            data: ''
+        });
+        setCarsView({
+            type: "filter",
+            data: brand
+        });
     }
 
     const handleDelete = async (id) => {
         deleteCar(id);
-        const newIds = carIds.filter(oneId => oneId !== id);
-        setDisplayCars(newIds);
-        setCurrentPage(1);
         
         const token = window.sessionStorage.getItem('token');
         try {
@@ -130,32 +109,34 @@ const CarsList = ({userType, history, allCars, carIds, setAllCars, deleteCar, br
     const handleSearch = (e) => {
         var {value} = e.target;
         value = value.toLowerCase();
-        const filteredCars = data.filter(car => car.model.toLowerCase().indexOf(value.toLowerCase()) !== -1);
-
-        setDisplayCars(filteredCars);
-        setCurrentPage(1);
         setSearchQuery(value);
+        setCarsView({
+            type: "search",
+            data: value
+        });
     }
 
-    const getPagedData = () => {
-        const paginatedCars = paginate(displayCars, currentPage, pageSize);
-        return {pageCars: paginatedCars, totalCount: displayCars.length};
-    };
-
     const handlePageChange = (page) => {
-        setCurrentPage(page);
+        setCarsView({
+            type: "pagechange",
+            data: page
+        });
     };
 
     const handleNumItems = (e) => {
         if (e.target.value === 'all') {
-            setPageSize(allCars.data.length);
+            setCarsView({
+                type: "pagesize",
+                data: allCars.data.length
+            });
         }
         else {
-            setPageSize(parseInt(e.target.value));
+            setCarsView({
+                type: "pagesize",
+                data: e.target.value
+            });
         }
     }
-
-    const { totalCount, pageCars } = getPagedData();
 
     return(
         <div>
@@ -168,7 +149,7 @@ const CarsList = ({userType, history, allCars, carIds, setAllCars, deleteCar, br
                                 allCars.isFetching === false ? (
                                     <div className="carsListContent">
                                         <div className="filter">
-                                            <FilterList data={brands.data} ids={brandIds} handleFilter={handleFilter} selectedItem={selectedBrand} />
+                                            <FilterList data={brands.data} ids={brandIds} handleFilter={handleFilter} selectedItem={viewCars.selectedBrand} />
                                         </div>
                                         <div className="listContent">
                                             <div className="topElements">
@@ -187,10 +168,10 @@ const CarsList = ({userType, history, allCars, carIds, setAllCars, deleteCar, br
                                                 </div>
                                             </div>
                                             {
-                                                pageCars.length !== 0 ? (
+                                                viewCars.data.length !== 0 ? (
                                                     <div className="table">
-                                                        <CarsTable ids={pageCars} cars={allCars.data} brands={brands.data} tableHead={tableHead}  api="carslist" handleDelete={handleDelete} userType={userType}/>
-                                                        <Pagination itemsCount={totalCount} pageSize={pageSize} currentPage={currentPage} onPageChange={handlePageChange} handleNumItems={handleNumItems} numItems={pageSize}/>
+                                                        <CarsTable ids={viewCars.data} cars={allCars.data} brands={brands.data} tableHead={tableHead}  api="carslist" handleDelete={handleDelete} userType={userType}/>
+                                                        <Pagination itemsCount={viewCars.filteredSize} pageSize={parseInt(viewCars.pageSize)} currentPage={parseInt(viewCars.currentPage)} onPageChange={handlePageChange} handleNumItems={handleNumItems} numItems={viewCars.pageSize}/>
                                                     </div>
                                                 ) : (
                                                     <div className="titleNoCars">
@@ -221,7 +202,8 @@ const mapStateToProps = (state) => ({
     allCars: state.allCars,
     brands: state.brands,
     brandIds: state.brandIds,
-    redirectToLogin: state.redirectToLogin
+    redirectToLogin: state.redirectToLogin,
+    viewCars: filterCars(state)
 });
 
 
