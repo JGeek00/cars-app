@@ -30,294 +30,189 @@ const carsSlice = createSlice({
         redirectToLogin: false
     },
     reducers: {
-        setUser: {
-            reducer(state, action) {
-                return {
-                    ...state,
-                    user: action.payload
-                }
+        setUser(state, action) {
+            state.user = action.payload
+        },
+        setAllCars(state, action) {
+            state.allCars = {
+                isFetching: false,
+                data: action.payload
             }
         },
-        setAllCars: {
-            reducer(state, action) {
-                return {
-                    ...state,
-                    allCars: {
-                        isFetching: false,
-                        data: action.payload
-                    }
+        setCarIds(state, action) {
+            state.carIds = action.payload
+        },
+        addCar(state, action) {
+            const newObject = {
+                ...state.allCars.data,
+                [action.payload.id]: action.payload.newCar
+            };
+            state.allCars = {
+                isFetching: false,
+                data: newObject
+            };
+        },
+        addCarId(state, action) {
+            var newIds = [...state.carIds];
+            newIds.push(action.payload)
+            newIds.sort((o1, o2) => {
+                const car1name = state.allCars.data[o1].model;
+                const car2name = state.allCars.data[o2].model;
+                if (car1name < car2name) {
+                    return -1;
                 }
+                if (car1name > car2name) {
+                    return 1;
+                }
+                return 0;
+            });
+            state.carIds = newIds
+        },
+        updateCar(state, action) {
+            var newObject = {
+                _id: action.payload.id,
+                model: action.payload.updatedCar.model,
+                brand_id: action.payload.updatedCar.brand,
+                creationDate: action.payload.updatedCar.creationDate
+            };
+            const updatedObject = {
+                ...state.allCars.data,
+                [action.payload.id]: newObject,
+            }
+            
+            state.allCars = {
+                isFetching: false,
+                data: updatedObject
             }
         },
-        setCarIds: {
-            reducer(state, action) {
-                return {
-                    ...state,
-                    carIds: action.payload
+        sortCars(state, action) {
+            var ids = [...state.carIds];
+            ids.sort((o1, o2) => {
+                const car1name = state.allCars.data[o1].model;
+                const car2name = state.allCars.data[o2].model;
+                if (car1name < car2name) {
+                    return -1;
                 }
-            }
+                if (car1name > car2name) {
+                    return 1;
+                }
+                return 0;
+            });
+            state.carIds = ids
         },
-        addCar: {
-            reducer(state, action) {
-                const newObject = {
-                    ...state.allCars.data,
-                    [action.payload.id]: action.payload.newCar
-                }
-                return {
-                    ...state,
-                    allCars: {
-                        isFetching: false,
-                        data: newObject
+        setCarsView(state, action) {
+            switch (action.payload.type) {
+                case "filter":
+                    if (action.payload.data === "all" || action.payload.data === "") {
+                        state.carView.selectedBrand = 'all';
+                        state.carView.currentPage = '1';
+                        break;
                     }
-                }
-            }
-        },
-        addCarId: {
-            reducer(state, action) {
-                var newIds = [...state.carIds];
-                newIds.push(action.payload)
-                newIds.sort((o1, o2) => {
-                    const car1name = state.allCars.data[o1].model;
-                    const car2name = state.allCars.data[o2].model;
-                    if (car1name < car2name) {
-                        return -1;
+                    else {
+                        state.carView.selectedBrand = action.payload.data;
+                        state.carView.currentPage = '1';
+                        break;
                     }
-                    if (car1name > car2name) {
-                        return 1;
-                    }
-                    return 0;
-                });
-                return {
-                    ...state,
-                    carIds: newIds
-                }
-            }
-        },
-        updateCar: {
-            reducer(state, action) {
-                var newObject = {
-                    _id: action.payload.id,
-                    model: action.payload.updatedCar.model,
-                    brand_id: action.payload.updatedCar.brand,
-                    creationDate: action.payload.updatedCar.creationDate
-                };
-                const updatedObject = {
-                    ...state.allCars.data,
-                    [action.payload.id]: newObject,
-                }
-                
-                return {
-                    ...state,
-                    allCars: {
-                        isFetching: false,
-                        data: updatedObject
-                    }
-                }
-            }
-        },
-        sortCars: {
-            reducer(state, action) {
-                var ids = [...state.carIds];
-                ids.sort((o1, o2) => {
-                    const car1name = state.allCars.data[o1].model;
-                    const car2name = state.allCars.data[o2].model;
-                    if (car1name < car2name) {
-                        return -1;
-                    }
-                    if (car1name > car2name) {
-                        return 1;
-                    }
-                    return 0;
-                });
-                return {
-                    ...state,
-                    carIds: ids
-                }
-            }
-        },
-        setCarsView: {
-            reducer(state, action) {
-                switch (action.payload.type) {
-                    case "filter":
-                        if (action.payload.data === "all" || action.payload.data === "") {
-                            return {
-                                ...state,
-                                carView: {
-                                    ...state.carView,
-                                    selectedBrand: "all",
-                                    currentPage: '1'
-                                }
-                            }
-                        }
-                        else {
-                            return {
-                                ...state,
-                                carView: {
-                                    ...state.carView,
-                                    selectedBrand: action.payload.data,
-                                    currentPage: '1'
-                                }
-                            }
-                        }
 
-                    case "search":
-                        return {
-                            ...state,
-                            carView: {
-                                ...state.carView,
-                                searchQuery: action.payload.data,
-                                currentPage: '1'
-                            }
-                        }
+                case "search":
+                    state.carView.searchQuery = action.payload.data;
+                    state.carView.currentPage = '1';
+                    break;
 
-                    case "pagechange":
-                        return {
-                            ...state,
-                            carView: {
-                                ...state.carView,
-                                currentPage: action.payload.data
-                            }
-                        }
+                case "pagechange":
+                    state.carView.currentPage = action.payload.data;
+                    break;
 
-                    case "pagesize":
-                        return {
-                            ...state,
-                            carView: {
-                                ...state.carView,
-                                pageSize: action.payload.data,
-                                currentPage: '1'
-                            }
-                        }
-                }
+                case "pagesize":
+                    state.carView.pageSize = action.payload.data;
+                    state.carView.currentPage = '1';
+                    break;
+                    
             }
         },
-        deleteCar: {
-            reducer(state, action) {
-                var newIds = [...state.carIds];
-                const index = newIds.indexOf(action.payload);
-                newIds.splice(index, 1);
-                
-                var carsObject = {...state.allCars.data};
-                delete carsObject[action.payload]
-                
-                return {
-                    ...state,
-                    carIds: newIds,
-                    allCars: {
-                        isFetching: false,
-                        data: carsObject
-                    }
-                }
+        deleteCar(state, action) {
+            var newIds = [...state.carIds];
+            const index = newIds.indexOf(action.payload);
+            newIds.splice(index, 1);
+            
+            var carsObject = {...state.allCars.data};
+            delete carsObject[action.payload]
+            
+            state.carIds = newIds;
+            state.allCars = {
+                isFetching: false,
+                data: carsObject
+            };
+        },
+        setBrands(state, action) {
+            state.brands = {
+                isFetching: false,
+                data: action.payload
             }
         },
-        setBrands: {
-            reducer(state, action) {
-                return {
-                    ...state,
-                    brands: {
-                        isFetching: false,
-                        data: action.payload
-                    }
-                }
+        setBrandIds(state, action) {
+            state.brandIds = action.payload
+        },
+        addBrand(state, action) {
+            const newObject = {
+                ...state.brands.data,
+                [action.payload.id]: action.payload.newBrand
+            }
+            state.brands = {
+                isFetching: false,
+                data: newObject
             }
         },
-        setBrandIds: {
-            reducer(state, action) {
-                return {
-                    ...state,
-                    brandIds: action.payload
+        addBrandId(state, action) {
+            var newIds = [...state.brandIds];
+            newIds.push(action.payload);
+            newIds.sort((o1, o2) => {
+                const e1 = state.brands.data[o1].name;
+                const e2 = state.brands.data[o2].name;
+                if (e1 < e2) {
+                    return -1;
                 }
+                if (e1 > e2) {
+                    return 1;
+                }
+                return 0;
+            });
+
+            state.brandIds = newIds
+        },
+        editBrand(state, action) {
+            const newObject = {
+                ...state.brands.data,
+                [action.payload.id]: action.payload.updatedBrand
+            }
+            state.brands = {
+                isFetching: false,
+                data: newObject
             }
         },
-        addBrand: {
-            reducer(state, action) {
-                const newObject = {
-                    ...state.brands.data,
-                    [action.payload.id]: action.payload.newBrand
+        sortBrands(state, action) {
+            var ids = [...state.brandIds];
+            ids.sort((o1, o2) => {
+                const e1 = state.brands.data[o1].name;
+                const e2 = state.brands.data[o2].name;
+                if (e1 < e2) {
+                    return -1;
                 }
-                return {
-                    ...state,
-                    brands: {
-                        isFetching: false,
-                        data: newObject
-                    }
+                if (e1 > e2) {
+                    return 1;
                 }
+                return 0;
+            });
+            state.brandIds = ids
+        },
+        setUsers(state, action) {
+            state.users = {
+                isFetching: false,
+                data: action.payload
             }
         },
-        addBrandId: {
-            reducer(state, action) {
-                var newIds = [...state.brandIds];
-                newIds.push(action.payload);
-                newIds.sort((o1, o2) => {
-                    const e1 = state.brands.data[o1].name;
-                    const e2 = state.brands.data[o2].name;
-                    if (e1 < e2) {
-                        return -1;
-                    }
-                    if (e1 > e2) {
-                        return 1;
-                    }
-                    return 0;
-                });
-                return {
-                    ...state,
-                    brandIds: newIds
-                }
-            }
-        },
-        editBrand: {
-            reducer(state, action) {
-                const newObject = {
-                    ...state.brands.data,
-                    [action.payload.id]: action.payload.updatedBrand
-                }
-                return {
-                    ...state,
-                    brands: {
-                        isFetching: false,
-                        data: newObject
-                    }
-                }
-            }
-        },
-        sortBrands: {
-            reducer(state, action) {
-                var ids = [...state.brandIds];
-                ids.sort((o1, o2) => {
-                    const e1 = state.brands.data[o1].name;
-                    const e2 = state.brands.data[o2].name;
-                    if (e1 < e2) {
-                        return -1;
-                    }
-                    if (e1 > e2) {
-                        return 1;
-                    }
-                    return 0;
-                });
-                return {
-                    ...state,
-                    brandIds: ids
-                }
-            }
-        },
-        setUsers: {
-            reducer(state, action) {
-                return {
-                    ...state,
-                    users: {
-                        isFetching: false,
-                        data: action.payload
-                    }
-                }
-            }
-        },
-        setRedirectToLogin: {
-            reducer(state, action) {
-                return {
-                    ...state,
-                    redirectToLogin: action.payload
-                }
-            }
+        setRedirectToLogin(state, action) {
+            state.sedirectToLogin = action.payload
         }
     }
 })
@@ -327,6 +222,8 @@ export const {setUser, setAllCars, setCarIds, updateCar, addCar, addCarId, sortC
 const middlewareEnhancer = applyMiddleware(thunkMiddleware);
 
 const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
+
+export const carsReducer = carsSlice.reducer;
 
 export default createStore(carsSlice.reducer, undefined, composeEnhancers(
     middlewareEnhancer
